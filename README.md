@@ -30,7 +30,7 @@ All commands are executed from the root directory:
 ## Technical Stack
 
 * **Framework:** Astro
-* **Styling:** Pure CSS (CSS Variables, Flexbox, CSS Grid)[
+* **Styling:** Pure CSS (CSS Variables, Flexbox, CSS Grid)
 * **Interactivity:** Vanilla JavaScript
 * **Physics Engine:** Matter.js (fetched via CDN, loaded strictly deferred)
 * **Typography:** Inter & Montserrat (Google Fonts)
