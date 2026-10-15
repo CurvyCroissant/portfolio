@@ -24,3 +24,11 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# Generated from the SVG sources during prebuild
+/public/apple-touch-icon.png
+/public/social-preview.png
+
+# Browser regression artifacts
+/playwright-report/
+/test-results/

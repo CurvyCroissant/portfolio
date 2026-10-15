@@ -1,0 +1,14 @@
+---
+import type { GetStaticPaths } from 'astro';
+import HomePage from '../components/HomePage.astro';
+import ProjectPage from '../components/ProjectPage.astro';
+import { projects, type Project } from '../data/projects';
+import { locales, type Locale } from '../lib/i18n';
+export const getStaticPaths = (() => locales.flatMap(locale => [
+  { params: { path: locale === 'en' ? undefined : locale }, props: { locale } },
+  ...projects.map(project => ({ params: { path: [locale === 'en' ? '' : locale, 'projects', project.slug].filter(Boolean).join('/') }, props: { locale, project } })),
+])) satisfies GetStaticPaths;
+interface Props { locale: Locale; project?: Project }
+const { locale, project } = Astro.props;
+---
+{project ? <ProjectPage locale={locale} project={project} /> : <HomePage locale={locale} />}

@@ -1,0 +1,35 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../layouts/Layout.astro';
+import Footer from './Footer.astro';
+import Icon from './Icon.astro';
+import ImageCard from './ImageCard.astro';
+import Timeline from './Timeline.astro';
+import { achievements, education, experience, skills } from '../data/site';
+import { projects } from '../data/projects';
+import { imageFor } from '../lib/images';
+import { routePath, t, type Locale } from '../lib/i18n';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+const portrait = imageFor('profile/self-image.jpg');
+---
+<Layout locale={locale}>
+  <main id="main-content" data-page="home">
+    <section class="hero" aria-labelledby="hero-title">
+      <a href={portrait.src} class="portrait-link" data-lightbox data-title={t(locale, 'portrait-title')} aria-label={t(locale, 'open-image', { title: t(locale, 'portrait-title') })}><Image class="profile-img" src={portrait} alt={t(locale, 'portrait-title')} width={640} height={640} widths={[240, 320, 480, 640]} sizes="(max-width: 445px) 70vw, 312px" format="webp" fit="cover" loading="eager" fetchpriority="high" decoding="async" /></a>
+      <h1 id="hero-title">{t(locale, 'my-name')}</h1><p>{t(locale, 'hero-desc')}</p>
+    </section>
+    <section id="education" class="section" aria-labelledby="education-title"><h2 class="section-title" id="education-title">{t(locale, 'sec-edu')}</h2><Timeline locale={locale} entries={education} /></section>
+    <section id="experience" class="section" aria-labelledby="experience-title"><h2 class="section-title" id="experience-title">{t(locale, 'sec-exp')}</h2><Timeline locale={locale} entries={experience} /></section>
+    <section id="achievements" class="section" aria-labelledby="achievements-title">
+      <h2 class="section-title" id="achievements-title">{t(locale, 'sec-ach')}</h2>
+      <div class="cert-grid">{achievements.map(achievement => <ImageCard locale={locale} image={achievement.image} caption={t(locale, achievement.titleKey)} description={achievement.descriptionKey ? t(locale, achievement.descriptionKey) : achievement.description} />)}</div>
+    </section>
+    <section id="projects" class="section" aria-labelledby="projects-title">
+      <h2 class="section-title" id="projects-title">{t(locale, 'sec-proj')}</h2>
+      <div class="project-grid">{projects.map(project => <a href={routePath(locale, `projects/${project.slug}`)} class="project-card" data-reveal><h3>{t(locale, project.titleKey)}<Icon name="external" size={18} /></h3><p>{t(locale, project.descriptionKey)}</p></a>)}</div>
+    </section>
+    <section id="skills" class="section" aria-labelledby="skills-title"><h2 class="section-title" id="skills-title">{t(locale, 'sec-skills')}</h2><ul class="skills-container" id="skills-container">{skills.filter(skill => skill.featured).map(skill => <li class="skill-pill">{skill.translation ? t(locale, skill.translation) : skill.label}</li>)}</ul></section>
+  </main>
+  <Footer locale={locale} />
+</Layout>
