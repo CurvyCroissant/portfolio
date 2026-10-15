@@ -123,7 +123,7 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
             {locales.map(language => <a class="lang-option" href={routePath(language, noindex ? '' : page)} lang={language} hreflang={language} aria-current={language === locale ? 'page' : undefined}>{languageNames[language]}</a>)}
           </nav>
         </details>
-        <button id="theme-toggle" class="control" type="button" aria-label={t(locale, 'appearance-label')} hidden><span class="toggle-text" id="theme-label">{t(locale, 'nav-theme-dark')}</span><span class="theme-moon"><Icon name="moon" /></span><span class="theme-sun"><Icon name="sun" /></span></button>
+        <button id="theme-toggle" class="control" type="button" aria-label={t(locale, 'appearance-label')} hidden><span class="toggle-text" id="theme-label" data-measure={t(locale, 'nav-theme-light')}>{t(locale, 'nav-theme-dark')}</span><span class="theme-moon"><Icon name="moon" /></span><span class="theme-sun"><Icon name="sun" /></span></button>
       </div>
     </header>
     <slot />

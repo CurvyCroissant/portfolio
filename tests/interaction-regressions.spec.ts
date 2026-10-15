@@ -18,6 +18,9 @@ for (const [kind, route, selector] of [
     await expect(skeleton).toBeVisible();
     expect(await skeleton.evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('skeleton-sweep');
     const before = await frame.boundingBox();
+    const placeholder = await skeleton.boundingBox();
+    expect(placeholder!.width).toBeCloseTo(before!.width, 0);
+    expect(placeholder!.height).toBeCloseTo(before!.height, 0);
     release();
     await expect(frame).toHaveAttribute('data-media-state', 'ready');
     await expect(frame).toHaveAttribute('aria-busy', 'false');
@@ -243,3 +246,21 @@ test.describe('touch interactions', () => {
     await expect(pill).not.toHaveAttribute('data-dragging', '');
   });
 });
+
+for (const theme of ['light', 'dark']) {
+  test(`header controls keep their positions while the application loads in ${theme} mode`, async ({ page }) => {
+    await page.addInitScript(theme => localStorage.setItem('theme', theme), theme);
+    let release!: () => void;
+    const pending = new Promise<void>(resolve => { release = resolve; });
+    await page.route('**/*.js', async route => { await pending; await route.continue(); });
+    await page.goto('', { waitUntil: 'commit' });
+    const language = page.locator('#lang-toggle');
+    await expect(language).toBeVisible();
+    const before = (await language.boundingBox())!;
+    release();
+    await expect(page.locator('#theme-toggle')).toBeVisible();
+    const after = (await language.boundingBox())!;
+    expect(after.x).toBeCloseTo(before.x, 0);
+    expect(after.y).toBeCloseTo(before.y, 0);
+  });
+}

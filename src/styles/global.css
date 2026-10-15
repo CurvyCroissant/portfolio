@@ -63,6 +63,8 @@ svg { display: block; flex-shrink: 0; }
 button:focus-visible, summary:focus-visible { background: var(--hover); }
 a:focus-visible { text-decoration: underline; text-underline-offset: .25em; }
 [hidden] { display: none !important; }
+.js .floating-controls > button[hidden] { display: inline-flex !important; visibility: hidden; }
+#theme-label::after { content: attr(data-measure); display: block; height: 0; visibility: hidden; overflow: hidden; }
 h1, h2, h3, p { margin: 0; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
 .skip-link { position: fixed; top: 12px; left: 12px; z-index: 4000; padding: 12px 20px; border-radius: 10px; background: var(--text); color: var(--bg); transform: translateY(-160%); }
@@ -225,6 +227,7 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
   transition: background-color var(--motion-ui) ease, color var(--motion-ui) ease, box-shadow var(--motion-ui) ease;
 }
 .motion-ready .cert-card, .motion-ready .project-card { transition: background-color var(--motion-ui) ease, color var(--motion-ui) ease, transform var(--motion-ui) var(--ease), box-shadow var(--motion-ui) ease; }
+.motion-ready :where(p, h1, h2, h3, dt, dd, .lang-menu, .lang-option, .social-link, .repo-link, .term-prompt) { transition: background-color var(--motion-ui) ease, color var(--motion-ui) ease; }
 .media-frame { display: block; position: relative; width: 100%; aspect-ratio: var(--media-ratio); overflow: hidden; isolation: isolate; }
 .media-frame.media-portrait { width: min(312px, 70vw); }
 .media-frame > img { display: block; width: 100%; height: 100%; object-fit: cover; }
@@ -252,9 +255,9 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
 .skeleton-sidebar i { height: 5px; min-height: 8%; }
 .skeleton-screen { position: absolute; display: grid; grid-template-columns: 1fr 1fr; gap: 12%; inset: 22% 7% 12% 28%; }
 .skeleton-screen i:nth-child(2), .skeleton-screen i:nth-child(3) { animation-delay: -.6s; }
-.skeleton-chart { position: absolute; display: flex; align-items: flex-end; justify-content: space-between; gap: 6%; inset: 23% 8% 13% 28%; }
-.skeleton-chart i { flex: 1; border-radius: 5px 5px 0 0; }
-.skeleton-chart i:nth-child(even) { animation-delay: -.75s; }
+.skeleton-plot { position: absolute; display: flex; align-items: flex-end; justify-content: space-between; gap: 6%; inset: 23% 8% 13% 28%; }
+.skeleton-plot i { flex: 1; border-radius: 5px 5px 0 0; }
+.skeleton-plot i:nth-child(even) { animation-delay: -.75s; }
 .skills-container[aria-busy="true"] .skill-pill { position: relative; overflow: hidden; color: transparent; background: var(--hover); animation: skeleton-breathe 2s ease-in-out infinite alternate; }
 .skills-container[aria-busy="true"] .skill-pill:nth-child(3n) { animation-delay: -.6s; }
 @keyframes skeleton-sweep { to { transform: translateX(100%); } }
