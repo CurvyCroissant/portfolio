@@ -20,11 +20,13 @@ Language links preserve the current project. Each page includes localized titles
 - Local images are processed at build time into responsive WebP thumbnails. The portrait loads eagerly with high priority; gallery thumbnails load lazily. Full-resolution originals are requested when opened, and remain available through normal image links without JavaScript.
 - JavaScript is bundled, minified, and given hashed filenames. Fonts and scripts require no third-party CDN requests.
 - Appearance follows the system until a manual light/dark choice is saved. Storage failures do not prevent the site from working. The browser theme color follows the selected appearance.
-- The language picker uses native `<details>`. The terminal and image viewer use native modal `<dialog>` elements, with explicit close buttons, labeled controls, background focus isolation, and focus restoration.
-- The image viewer supports wheel zoom, pinch zoom, drag-to-pan, rotation, and keyboard `+`, `-`, and `0`. Rotated images are fitted and bounded against the visible stage.
+- The language picker uses native `<details>`. The terminal and image viewer use native modal `<dialog>` elements with background focus isolation and focus restoration. Both dismiss with Escape or a background click; the terminal also has a close button. Focus uses subtle surface changes without outlines.
+- The image viewer shows only the media over a dimmed backdrop. It supports wheel/pinch zoom, drag-to-pan, double-click zoom/reset, and keyboard `+`, `-`, and `0`. Certificates with stored rotation are fitted to the full viewport. Opening and closing animate to/from the source over 400 ms; page reveals use 900 ms and surface transitions use 600 ms.
+- Portraits, certificates, screenshots, and charts have matching animated skeletons in thumbnails and the viewer. The skills enhancement uses pill-shaped skeletons while downloading. Reserved dimensions prevent layout shifts; skeletons stop on success/failure and honor reduced motion. Static text needs no loading placeholder.
+- Refresh and project-return scroll positions restore before the page becomes visible.
 - Open the terminal with its button or `/`. Commands: `help`, `about`, `education`, `experience`, `achievements`, `skills`, `projects`, `contact`, `clear`, and `exit`. Input is always handled as plain text.
 - Email is a normal `mailto:` link, with a separate copy button and localized status feedback.
-- Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes the simulation; its animation loop stops when the pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Touch gestures retain vertical page scrolling.
+- Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes neighbouring pills; small physics steps and a bounded spring prevent cursor jumps from tunnelling through them. The animation loop stops when pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Pills capture touch drags; the surrounding space retains vertical page scrolling.
 - Reduced motion disables decorative reveals, transitions, and physics. Content is never hidden while waiting for animation code.
 
 ## Development

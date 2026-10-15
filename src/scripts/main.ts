@@ -1,6 +1,7 @@
 import type { ClientCopy } from '../lib/i18n';
 import { setupLightbox } from './lightbox';
-import { readStorage, removeStorage, updateScrollLock, writeStorage } from './preferences';
+import { readStorage, updateScrollLock, writeStorage } from './preferences';
+import { motionDuration, motionEase, reducedMotion } from './motion';
 
 function setupTheme(copy: ClientCopy) {
   const button = document.querySelector<HTMLButtonElement>('#theme-toggle');
@@ -47,25 +48,48 @@ function setupTerminal(copy: ClientCopy) {
   const status = document.querySelector('#terminal-status');
   if (!dialog || !input || !form || !history || !trigger || typeof dialog.showModal !== 'function') return;
   let opener: HTMLElement | null = null;
+  let animation: Animation | undefined, closing = false;
   const open = () => {
     if (document.querySelector('dialog[open]')) return;
     opener = document.activeElement instanceof HTMLElement ? document.activeElement : trigger;
     dialog.showModal();
     updateScrollLock();
     input.focus({ preventScroll: true });
+    if (motionDuration('dialog')) animation = dialog.animate([{ opacity: 0, transform: 'translateY(20px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('dialog'), easing: motionEase() });
+  };
+  const close = async () => {
+    if (closing || !dialog.open) return;
+    closing = true;
+    const transform = getComputedStyle(dialog).transform;
+    const opacity = getComputedStyle(dialog).opacity;
+    animation?.cancel();
+    dialog.dataset.closing = '';
+    if (motionDuration('dialog')) {
+      animation = dialog.animate([{ opacity, transform }, { opacity: 0, transform: 'translateY(20px) scale(.96)' }], { duration: motionDuration('dialog'), easing: motionEase(), fill: 'forwards' });
+      await animation.finished.catch(() => {});
+    }
+    if (dialog.open) dialog.close();
   };
   trigger.addEventListener('click', open);
   trigger.hidden = false;
-  document.querySelector('#terminal-close')?.addEventListener('click', () => dialog.close());
+  document.querySelector('#terminal-close')?.addEventListener('click', () => { void close(); });
+  dialog.addEventListener('cancel', event => { event.preventDefault(); void close(); });
   dialog.addEventListener('click', event => {
     if (event.target !== dialog) return;
     const bounds = dialog.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) dialog.close();
+    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) void close();
   });
   dialog.addEventListener('close', () => {
+    animation?.cancel(); animation = undefined;
+    closing = false;
+    delete dialog.dataset.closing;
     input.value = '';
     updateScrollLock();
     opener?.focus({ preventScroll: true });
+  });
+  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) animation?.finish(); });
+  document.querySelector('.terminal-body')?.addEventListener('click', event => {
+    if (!(event.target as HTMLElement).closest('a, button') && !getSelection()?.toString()) input.focus({ preventScroll: true });
   });
   document.addEventListener('keydown', event => {
     const target = event.target as HTMLElement;
@@ -87,9 +111,11 @@ function setupTerminal(copy: ClientCopy) {
     if (!raw) return;
     input.value = '';
     const command = raw.toLowerCase();
-    if (command === 'exit') { dialog.close(); return; }
+    if (command === 'exit') { void close(); return; }
     if (command === 'clear') {
       history.replaceChildren();
+      const intro = document.querySelector<HTMLElement>('#term-intro');
+      if (intro) intro.hidden = true;
       if (status) status.textContent = copy['terminal-cleared'];
       return;
     }
@@ -145,14 +171,8 @@ function setupCopy(copy: ClientCopy) {
 
 function setupScrollRestoration() {
   const key = `portfolio-scroll:${document.documentElement.lang}`;
-  if (document.querySelector('[data-page="home"]')) {
-    const saved = readStorage('sessionStorage', key);
-    if (saved !== null) {
-      const top = Number(saved);
-      if (Number.isFinite(top) && top >= 0) requestAnimationFrame(() => scrollTo({ top, behavior: 'auto' }));
-      removeStorage('sessionStorage', key);
-    }
-  }
+  const top = Number(document.documentElement.dataset.restoreScroll);
+  if (Number.isFinite(top) && top > 0 && !location.hash) scrollTo({ top, behavior: 'instant' });
   document.querySelectorAll('.project-card').forEach(card => card.addEventListener('click', () => writeStorage('sessionStorage', key, String(scrollY))));
 }
 
@@ -163,14 +183,25 @@ function setupReveals() {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       observer.unobserve(entry.target);
+      entry.target.removeAttribute('data-reveal-pending');
       if (reduced.matches) continue;
-      const animation = entry.target.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }], { duration: 240, easing: 'ease-out' });
+      const animation = entry.target.animate([{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('reveal'), easing: motionEase() });
       animations.add(animation);
       animation.finished.then(() => animations.delete(animation)).catch(() => animations.delete(animation));
     }
   }, { threshold: 0.05 });
-  document.querySelectorAll('[data-reveal]').forEach(element => observer.observe(element));
-  reduced.addEventListener('change', () => { if (reduced.matches) animations.forEach(animation => animation.cancel()); });
+  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(element => {
+    const bounds = element.getBoundingClientRect();
+    // Already-visible content stays visible during startup and scroll restoration.
+    if (reduced.matches || (bounds.top < innerHeight && bounds.bottom > 0)) return;
+    element.dataset.revealPending = '';
+    observer.observe(element);
+  });
+  reduced.addEventListener('change', () => {
+    if (!reduced.matches) return;
+    animations.forEach(animation => animation.cancel());
+    document.querySelectorAll('[data-reveal-pending]').forEach(element => element.removeAttribute('data-reveal-pending'));
+  });
 }
 
 function setupSkills() {
@@ -182,6 +213,7 @@ function setupSkills() {
   const start = async () => {
     if (reduced.matches || dispose || loading) return;
     loading = true;
+    container.setAttribute('aria-busy', 'true');
     try {
       const { setupPhysics } = await import('./skills-physics');
       if (!reduced.matches) {
@@ -189,7 +221,7 @@ function setupSkills() {
         if (reduced.matches) cleanup(); else dispose = cleanup;
       }
     } catch { /* The static list remains fully usable if the enhancement fails. */ }
-    finally { loading = false; }
+    finally { loading = false; container.setAttribute('aria-busy', 'false'); }
   };
   const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) void start(); }, { rootMargin: '200px' });
   observer.observe(container);
@@ -211,6 +243,7 @@ function initialize() {
   setupScrollRestoration();
   setupReveals();
   setupSkills();
+  requestAnimationFrame(() => document.documentElement.classList.add('motion-ready'));
 }
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
 else initialize();

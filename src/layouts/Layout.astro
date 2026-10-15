@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
+import Skeleton from '../components/Skeleton.astro';
 import { site } from '../data/site';
 import { absoluteUrl, clientCopy, languageNames, locales, routePath, t, type Locale } from '../lib/i18n';
 interface Props { locale: Locale; title?: string; description?: string; page?: string; noindex?: boolean }
@@ -10,7 +11,7 @@ const ogLocales = { en: 'en_US', id: 'id_ID', ja: 'ja_JP' };
 const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
 ---
 <!doctype html>
-<html lang={locale}>
+<html lang={locale} data-home={!page && !noindex ? '' : undefined}>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -42,11 +43,71 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
     <meta name="twitter:image" content={absoluteUrl(`${site.base}/social-preview.png`)} />
     <script is:inline>
       (() => {
+        const root = document.documentElement;
+        root.classList.add('js');
         let theme;
         try { theme = localStorage.getItem('theme'); } catch {}
         const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
         document.documentElement.dataset.theme = dark ? 'dark' : 'light';
         document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0a0a0a' : '#fafafa');
+
+        // Capture even cached images before the application module downloads.
+        const settleMedia = (image, failed = false) => {
+          if (!(image instanceof HTMLImageElement)) return;
+          const frame = image.closest('.media-frame');
+          if (!frame) return;
+          const finish = error => {
+            frame.dataset.mediaState = error ? 'error' : 'ready';
+            frame.setAttribute('aria-busy', 'false');
+          };
+          if (failed) finish(true);
+          else image.decode().then(() => finish(false), () => finish(true));
+        };
+        document.addEventListener('load', event => settleMedia(event.target), true);
+        document.addEventListener('error', event => settleMedia(event.target, true), true);
+
+        // Restore before showing a refreshed/returning page, rather than painting its top first.
+        let top;
+        const navigation = performance.getEntriesByType('navigation')[0];
+        const positionKey = `portfolio-position:${location.pathname}`;
+        if (navigation?.type === 'reload' || navigation?.type === 'back_forward') {
+          top = history.state?.portfolioScroll;
+          try { if (top === undefined && sessionStorage.getItem(positionKey) !== null) top = Number(sessionStorage.getItem(positionKey)); } catch {}
+        }
+        const key = `portfolio-scroll:${root.lang}`;
+        if (root.hasAttribute('data-home')) {
+          try {
+            if (top === undefined && sessionStorage.getItem(key) !== null) top = Number(sessionStorage.getItem(key));
+            sessionStorage.removeItem(key);
+          } catch {}
+        }
+        try { history.scrollRestoration = 'manual'; } catch {}
+        if (Number.isFinite(top) && top > 0 && !location.hash) {
+          root.classList.add('restoring-scroll');
+          root.dataset.restoreScroll = String(top);
+          let restored = false;
+          const restore = () => {
+            if (restored) return;
+            restored = true;
+            scrollTo({ top, behavior: 'instant' });
+            root.classList.remove('restoring-scroll');
+          };
+          document.addEventListener('DOMContentLoaded', restore, { once: true });
+          window.addEventListener('pageshow', restore, { once: true });
+        }
+        const savePosition = () => {
+          if (root.classList.contains('restoring-scroll')) return;
+          try { sessionStorage.setItem(positionKey, String(scrollY)); } catch {}
+          try { history.replaceState({ ...history.state, portfolioScroll: scrollY }, ''); } catch {}
+        };
+        let lastSave = 0, saveTimer;
+        window.addEventListener('scroll', () => {
+          clearTimeout(saveTimer);
+          if (performance.now() - lastSave > 100) { savePosition(); lastSave = performance.now(); }
+          else saveTimer = setTimeout(savePosition, 100);
+        }, { passive: true });
+        window.addEventListener('pagehide', savePosition);
+        document.addEventListener('visibilitychange', () => { if (document.hidden) savePosition(); });
       })();
     </script>
   </head>
@@ -67,15 +128,13 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
     </header>
     <slot />
     <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-title">
-      <div class="lightbox-header"><h2 id="lightbox-title">{t(locale, 'image-viewer')}</h2><button class="icon-button" id="lightbox-close" type="button" aria-label={t(locale, 'close')} autofocus><Icon name="close" /></button></div>
-      <div class="lightbox-stage" id="lightbox-stage"><img id="lightbox-image" alt="" decoding="async" /><p id="lightbox-status" role="status">{t(locale, 'image-loading')}</p></div>
-      <div class="lightbox-toolbar">
-        <button class="icon-button" id="zoom-out" type="button" aria-label={t(locale, 'zoom-out')}><Icon name="minus" /></button>
-        <output id="zoom-level" aria-label={t(locale, 'zoom-level')} aria-live="off">100%</output>
-        <button class="icon-button" id="zoom-in" type="button" aria-label={t(locale, 'zoom-in')}><Icon name="plus" /></button>
-        <button class="icon-button" id="zoom-reset" type="button" aria-label={t(locale, 'zoom-reset')}><Icon name="reset" /></button>
-        <button class="icon-button" id="rotate-image" type="button" aria-label={t(locale, 'rotate-image')}><Icon name="rotate" /></button>
-        <a class="original-link" id="original-image" target="_blank" rel="noopener noreferrer">{t(locale, 'open-original')}</a>
+      <h2 class="sr-only" id="lightbox-title">{t(locale, 'image-viewer')}</h2>
+      <div class="lightbox-stage" id="lightbox-stage">
+        <div class="lightbox-media" id="lightbox-media" data-media-state="loading">
+          <div id="lightbox-loader" aria-hidden="true"><Skeleton kind="portrait" /><Skeleton kind="certificate" /><Skeleton kind="screenshot" /><Skeleton kind="chart" /></div>
+          <img id="lightbox-image" alt="" decoding="async" hidden />
+        </div>
+        <p class="sr-only" id="lightbox-status" role="status"></p>
       </div>
     </dialog>
     <dialog class="terminal-dialog" id="terminal-dialog" aria-labelledby="terminal-title" aria-describedby="term-intro">

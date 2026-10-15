@@ -8,5 +8,9 @@ export function removeStorage(kind: 'localStorage' | 'sessionStorage', key: stri
   try { window[kind].removeItem(key); } catch { /* Navigation still works without storage. */ }
 }
 export function updateScrollLock(): void {
-  document.documentElement.classList.toggle('dialog-open', !!document.querySelector('dialog[open]'));
+  const root = document.documentElement;
+  const open = !!document.querySelector('dialog[open]');
+  if (open && !root.classList.contains('dialog-open')) root.style.setProperty('--scrollbar-width', `${innerWidth - root.clientWidth}px`);
+  root.classList.toggle('dialog-open', open);
+  if (!open) root.style.removeProperty('--scrollbar-width');
 }

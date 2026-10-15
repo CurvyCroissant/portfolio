@@ -4,14 +4,16 @@ import type { Body, Constraint } from 'matter-js';
 /** A decorative enhancement: readable flex layout first, physics only during interaction. */
 export async function setupPhysics(container: HTMLElement): Promise<() => void> {
   await document.fonts.ready;
-  const engine = Matter.Engine.create({ enableSleeping: true });
+  const engine = Matter.Engine.create({ enableSleeping: true, positionIterations: 10, velocityIterations: 8, constraintIterations: 4 });
   engine.gravity.x = engine.gravity.y = 0;
   const pills = [...container.querySelectorAll<HTMLElement>('.skill-pill')];
   let bodies: { element: HTMLElement; body: Body; width: number; height: number; x: number; y: number }[] = [];
   let frame: number | undefined, resizeFrame: number | undefined;
   let lastTime = 0, accumulator = 0, lastWidth = 0;
   let visible = false, disposed = false;
-  let drag: { pointer: number; element: HTMLElement; constraint: Constraint } | undefined;
+  let drag: { pointer: number; element: HTMLElement; constraint: Constraint; target: { x: number; y: number } } | undefined;
+  const step = 1000 / 120;
+  const wake = () => bodies.forEach(item => Matter.Sleeping.set(item.body, false));
 
   const draw = () => {
     for (const item of bodies) {
@@ -27,9 +29,24 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
   const tick = (now: number) => {
     frame = undefined;
     if (disposed || !visible || document.hidden || !awake()) return;
-    accumulator += lastTime ? Math.min(32, now - lastTime) : 1000 / 60;
+    accumulator += lastTime ? Math.min(32, now - lastTime) : step;
     lastTime = now;
-    while (accumulator >= 1000 / 60) { Matter.Engine.update(engine, 1000 / 60); accumulator -= 1000 / 60; }
+    while (accumulator >= step) {
+      if (drag) {
+        // A cursor can jump across the whole box in one event. Advance its spring
+        // in small steps so the collision solver sees every pill along the path.
+        const anchor = drag.constraint.pointA;
+        const dx = drag.target.x - anchor.x, dy = drag.target.y - anchor.y;
+        const ratio = Math.min(1, 4 / (Math.hypot(dx, dy) || 1));
+        anchor.x += dx * ratio; anchor.y += dy * ratio;
+      }
+      for (const item of bodies) {
+        const speed = Matter.Body.getSpeed(item.body);
+        if (speed > 8) Matter.Body.setSpeed(item.body, 8);
+      }
+      Matter.Engine.update(engine, step);
+      accumulator -= step;
+    }
     draw();
     if (awake()) frame = requestAnimationFrame(tick);
     else lastTime = 0;
@@ -39,6 +56,7 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
     if (!drag) return;
     const current = drag;
     drag = undefined;
+    current.element.removeAttribute('data-dragging');
     Matter.Composite.remove(engine.world, current.constraint);
     if (current.element.hasPointerCapture(current.pointer)) current.element.releasePointerCapture(current.pointer);
     start();
@@ -66,7 +84,7 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
       Matter.Bodies.rectangle(width + thickness / 2, height / 2, thickness, height + 2 * thickness, wall),
     ]);
     bodies = measured.map(item => {
-      const body = Matter.Bodies.rectangle(item.x + item.width / 2, item.y + item.height / 2, item.width, item.height, { frictionAir: .12, friction: .8, restitution: 0, chamfer: { radius: Math.min(16, item.height / 2 - 1) } });
+      const body = Matter.Bodies.rectangle(item.x + item.width / 2, item.y + item.height / 2, item.width, item.height, { frictionAir: .1, friction: .8, restitution: 0, density: .01, sleepThreshold: 30, chamfer: { radius: Math.min(18, item.height / 2 - 1) } });
       Matter.Body.setInertia(body, Infinity);
       Matter.Sleeping.set(body, true);
       Matter.Composite.add(engine.world, body);
@@ -86,17 +104,20 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
     const item = bodies.find(body => body.element === element);
     if (!item || !element) return;
     const point = coordinates(event);
-    Matter.Sleeping.set(item.body, false);
-    const constraint = Matter.Constraint.create({ pointA: point, bodyB: item.body, pointB: { x: point.x - item.body.position.x, y: point.y - item.body.position.y }, length: 0, stiffness: .15, damping: .2 });
+    // Sleeping neighbours must participate before the first constraint solve.
+    wake();
+    const constraint = Matter.Constraint.create({ pointA: { ...point }, bodyB: item.body, pointB: { x: point.x - item.body.position.x, y: point.y - item.body.position.y }, length: 0, stiffness: .025, damping: .2 });
     Matter.Composite.add(engine.world, constraint);
     element.setPointerCapture(event.pointerId);
-    drag = { pointer: event.pointerId, element, constraint };
+    element.dataset.dragging = '';
+    drag = { pointer: event.pointerId, element, constraint, target: point };
     start();
   };
   const move = (event: PointerEvent) => {
     if (drag?.pointer !== event.pointerId) return;
-    drag.constraint.pointA = coordinates(event);
-    if (drag.constraint.bodyB) Matter.Sleeping.set(drag.constraint.bodyB, false);
+    const point = coordinates(event);
+    drag.target = { x: Math.max(0, Math.min(container.clientWidth, point.x)), y: Math.max(0, Math.min(container.clientHeight, point.y)) };
+    wake();
     start();
   };
   const up = (event: PointerEvent) => { if (drag?.pointer === event.pointerId) release(); };

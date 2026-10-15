@@ -1,0 +1,10 @@
+---
+export type MediaKind = 'portrait' | 'certificate' | 'screenshot' | 'chart';
+interface Props { kind: MediaKind }
+const { kind } = Astro.props;
+---
+<span class:list={['skeleton', `skeleton-${kind}`]} data-skeleton-kind={kind} aria-hidden="true">
+  {kind === 'portrait' && <><span class="skeleton-head skeleton-block"></span><span class="skeleton-shoulders skeleton-block"></span></>}
+  {kind === 'certificate' && <><span class="skeleton-seal skeleton-block"></span><span class="skeleton-heading skeleton-block"></span><span class="skeleton-copy"><i class="skeleton-block"></i><i class="skeleton-block"></i><i class="skeleton-block"></i></span><span class="skeleton-signatures"><i class="skeleton-block"></i><i class="skeleton-block"></i></span></>}
+  {(kind === 'screenshot' || kind === 'chart') && <><span class="skeleton-chrome"><i class="skeleton-block"></i><i class="skeleton-block"></i><i class="skeleton-block"></i></span><span class="skeleton-sidebar"><i class="skeleton-block"></i><i class="skeleton-block"></i><i class="skeleton-block"></i></span>{kind === 'chart' ? <span class="skeleton-chart">{[40, 72, 54, 90, 66, 82].map(height => <i class="skeleton-block" style={`height:${height}%`}></i>)}</span> : <span class="skeleton-screen"><i class="skeleton-block"></i><i class="skeleton-block"></i><i class="skeleton-block"></i><i class="skeleton-block"></i></span>}</>}
+</span>

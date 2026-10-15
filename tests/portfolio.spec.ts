@@ -92,7 +92,7 @@ for (const locale of locales) {
     await expect(trigger).toBeFocused();
   });
 
-  test(`lightbox fits rotated certificates and exposes zoom and close controls: ${locale}`, async ({ page }) => {
+  test(`lightbox fits rotated certificates and supports gestures without visible controls: ${locale}`, async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 667 });
     await page.goto(prefix(locale));
     const trigger = page.locator('.proof-link').first();
@@ -103,11 +103,11 @@ for (const locale of locales) {
       const stage = document.querySelector('#lightbox-stage')!.getBoundingClientRect();
       return image.left >= stage.left - 1 && image.right <= stage.right + 1 && image.top >= stage.top - 1 && image.bottom <= stage.bottom + 1;
     })).toBe(true);
-    await page.locator('#zoom-in').click();
-    await expect(page.locator('#zoom-level')).toHaveText('125%');
+    await expect(page.locator('#lightbox button, #lightbox a, #lightbox output')).toHaveCount(0);
+    await page.keyboard.press('+');
+    await expect.poll(() => page.locator('#lightbox-media').evaluate(element => new DOMMatrix(getComputedStyle(element).transform).a)).toBeCloseTo(1.25);
     await page.keyboard.press('0');
-    await expect(page.locator('#zoom-level')).toHaveText('100%');
-    await page.locator('#rotate-image').click();
+    await expect.poll(() => page.locator('#lightbox-media').evaluate(element => new DOMMatrix(getComputedStyle(element).transform).a)).toBeCloseTo(1);
     await page.setViewportSize({ width: 820, height: 360 });
     await expect.poll(() => page.evaluate(() => {
       const image = document.querySelector('#lightbox-image')!.getBoundingClientRect();
@@ -217,8 +217,8 @@ test('initial homepage images are small and do not request originals or external
   expect((await Promise.all(images)).reduce((a, b) => a + b, 0)).toBeLessThan(200_000);
   expect(external).toEqual([]);
   expect(scripts.some(url => url.includes('skills-physics'))).toBe(false);
-  await expect(page.locator('.profile-img')).toHaveAttribute('loading', 'eager');
-  await expect(page.locator('.profile-img')).toHaveAttribute('srcset', /\.webp/);
+  await expect(page.locator('.media-portrait img')).toHaveAttribute('loading', 'eager');
+  await expect(page.locator('.media-portrait img')).toHaveAttribute('srcset', /\.webp/);
 });
 
 test('skills sleep without animation frames, survive resizing, and honor reduced motion changes', async ({ page }) => {
@@ -287,14 +287,14 @@ test('all generated internal links, images, scripts, and language alternatives r
   expect(files.filter(file => file.endsWith('.html'))).toHaveLength(22);
 });
 
-test('image loading failures preserve an accessible close button and original link', async ({ page }) => {
+test('image loading failures dismiss with Escape and restore focus without extra controls', async ({ page }) => {
   await page.goto('ja/');
   const trigger = page.locator('.proof-link').first();
   const href = await trigger.getAttribute('href');
   await page.route(`**${href}`, route => route.abort());
   await trigger.click();
   await expect(page.locator('#lightbox-status')).toHaveText(messages['image-error'].ja);
-  await expect(page.locator('#original-image')).toHaveAttribute('href', new URL(href!, page.url()).href);
-  await page.locator('#lightbox-close').click();
+  await expect(page.locator('#lightbox button, #lightbox a')).toHaveCount(0);
+  await page.keyboard.press('Escape');
   await expect(trigger).toBeFocused();
 });

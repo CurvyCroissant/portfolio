@@ -1,15 +1,17 @@
 ---
-import { Image } from 'astro:assets';
+import Media from './Media.astro';
+import type { MediaKind } from './Skeleton.astro';
 import Icon from './Icon.astro';
 import { imageFor } from '../lib/images';
 import { t, type Locale } from '../lib/i18n';
 interface Props { locale: Locale; image: string; caption: string; description?: string; position?: string; rotation?: number }
 const { locale, image, caption, description, position = 'center', rotation = 0 } = Astro.props;
 const source = imageFor(image);
+const kind: MediaKind = image.startsWith('certificates/') ? 'certificate' : /anomaly-detection|business-simulation|model-benchmarking/.test(image) ? 'chart' : 'screenshot';
 ---
 <div class="gallery-item" data-reveal>
-  <a class="cert-card" href={source.src} data-lightbox data-title={caption} data-rotation={rotation} aria-label={t(locale, 'open-image', { title: caption })}>
-    <Image class="card-image" src={source} alt={caption} width={640} height={440} widths={[320, 640]} sizes="(max-width: 399px) calc(100vw - 72px), 320px" format="webp" fit="cover" position={position} loading="lazy" decoding="async" />
+  <a class="cert-card" href={source.src} data-lightbox data-media-kind={kind} data-media-width={source.width} data-media-height={source.height} data-title={caption} data-rotation={rotation} aria-label={t(locale, 'open-image', { title: caption })}>
+    <Media source={source} locale={locale} kind={kind} alt={caption} width={640} height={440} widths={[320, 640]} sizes="(max-width: 399px) calc(100vw - 72px), 320px" position={position} />
     <div class="cert-info"><h3>{caption}<Icon name="external" size={15} /></h3>{description && <p>{description}</p>}</div>
   </a>
 </div>

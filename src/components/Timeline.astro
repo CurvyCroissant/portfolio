@@ -11,6 +11,6 @@ const { locale, entries } = Astro.props;
     <div class="list-header"><h3 class="list-title">{entry.titleKey ? t(locale, entry.titleKey) : entry.title}</h3><p class="list-date"><time datetime={entry.start}>{dateLabel(entry.start, locale)}</time> – {entry.end ? <time datetime={entry.end}>{dateLabel(entry.end, locale)}</time> : t(locale, 'present')}</p></div>
     <p class="list-subtitle">{entry.subtitleKey ? t(locale, entry.subtitleKey) : entry.subtitle}</p>
     <p class="list-content">{t(locale, entry.descriptionKey)}</p>
-    {entry.certificate && <a class="proof-link" href={imageFor(entry.certificate).src} data-lightbox data-title={`${entry.titleKey ? t(locale, entry.titleKey) : entry.title} — ${t(locale, 'view-cert')}`} data-rotation={entry.rotation ?? 0}>{t(locale, 'view-cert')}<Icon name="external" size={16} /></a>}
+    {entry.certificate && <a class="proof-link" href={imageFor(entry.certificate).src} data-lightbox data-media-kind="certificate" data-media-width={imageFor(entry.certificate).width} data-media-height={imageFor(entry.certificate).height} data-title={`${entry.titleKey ? t(locale, entry.titleKey) : entry.title} — ${t(locale, 'view-cert')}`} data-rotation={entry.rotation ?? 0}>{t(locale, 'view-cert')}<Icon name="external" size={16} /></a>}
   </article>)}
 </div>
