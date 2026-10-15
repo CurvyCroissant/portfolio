@@ -6,7 +6,7 @@ for (const [kind, route, selector] of [
   ['screenshot', 'projects/posture-alert/', '.cert-card .media-frame'],
   ['chart', 'projects/crop-yield-predictor/', '.cert-card .media-frame'],
 ]) {
-  test(`${kind} has its own animated skeleton until decoded, without layout shift`, async ({ page }) => {
+  test(`${kind} uses the shared image skeleton until decoded, without layout shift`, async ({ page }) => {
     let release!: () => void;
     const pending = new Promise<void>(resolve => { release = resolve; });
     await page.route('**/*.webp', async route => { await pending; await route.continue(); });
@@ -14,7 +14,7 @@ for (const [kind, route, selector] of [
     const frame = page.locator(selector).first();
     await frame.scrollIntoViewIfNeeded();
     await expect(frame).toHaveAttribute('data-media-state', 'loading');
-    const skeleton = frame.locator(`[data-skeleton-kind="${kind}"]`);
+    const skeleton = frame.locator('[data-skeleton-kind="image"]');
     await expect(skeleton).toBeVisible();
     expect(await skeleton.evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('skeleton-sweep');
     const before = await frame.boundingBox();
@@ -66,7 +66,7 @@ test('the matching lightbox skeleton remains dismissible while loading and late 
   await page.route(`**${href}`, async route => { await pending; await route.continue(); });
   await trigger.click();
   await expect(page.locator('#lightbox-media')).toHaveAttribute('data-media-state', 'loading');
-  await expect(page.locator('#lightbox-loader .skeleton-certificate')).toBeVisible();
+  await expect(page.locator('#lightbox-loader .skeleton-image')).toBeVisible();
   await expect(page.locator('#lightbox-loader .skeleton:not([hidden])')).toHaveCount(1);
   await page.mouse.click(4, 4);
   await expect(page.locator('#lightbox')).not.toBeVisible();
@@ -112,7 +112,8 @@ test('refresh and return from a project restore the scroll position before any v
     const positions: number[] = [];
     Object.assign(window, { __visiblePositions: positions });
     const sample = () => {
-      if (document.body && getComputedStyle(document.body).visibility === 'visible' && document.body.scrollHeight > 500) positions.push(scrollY);
+      const home = document.querySelector<HTMLElement>('[data-page="home"]');
+      if (home && getComputedStyle(home).visibility === 'visible' && !document.documentElement.hasAttribute('data-navigating')) positions.push(scrollY);
       requestAnimationFrame(sample);
     };
     requestAnimationFrame(sample);
@@ -140,7 +141,7 @@ test('skills have a pill-shaped skeleton during the deferred enhancement and sta
   release();
   await expect(page.locator('#skills-container')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#skills-container')).not.toHaveClass(/physics-active/);
-  await expect(page.locator('.skill-pill').first()).toHaveText('Python');
+  await expect(page.locator('#skills-container')).toContainText('Python');
 });
 
 for (const width of [375, 1280]) {

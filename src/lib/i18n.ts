@@ -39,7 +39,7 @@ export function clientCopy(locale: Locale) {
       `exit           ${t(locale, 'close')}`,
     ].join('\n'),
     about: `${t(locale, 'my-name')}\n${t(locale, 'hero-desc')}\n${t(locale, 'gpa-label')}: ${new Intl.NumberFormat(locale).format(site.facts.gpa)}`,
-    education: education.map(entry => `${dateRange(entry, locale)}: ${entry.subtitleKey ? t(locale, entry.subtitleKey) : entry.subtitle ?? ''} @ ${entry.title}`).join('\n'),
+    education: education.map(entry => `${dateRange(entry, locale)}: ${entry.subtitleKey ? t(locale, entry.subtitleKey) : entry.subtitle ?? ''} @ ${entry.titleKey ? t(locale, entry.titleKey) : entry.title}`).join('\n'),
     experience: experience.map(entry => `${dateRange(entry, locale)}: ${entry.titleKey ? t(locale, entry.titleKey) : entry.title} @ ${entry.subtitle}`).join('\n'),
     achievements: achievements.map(entry => `${t(locale, entry.titleKey)} — ${entry.descriptionKey ? t(locale, entry.descriptionKey) : entry.description}`).join('\n'),
     skills: [...new Set(skills.map(skill => skill.category))].map(category => `${t(locale, category)}: ${skills.filter(skill => skill.category === category).map(skill => skill.translation ? t(locale, skill.translation) : skill.label).join(', ')}`).join('\n'),

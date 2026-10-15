@@ -16,7 +16,7 @@ const portrait = imageFor('profile/self-image.jpg');
 <Layout locale={locale}>
   <main id="main-content" data-page="home">
     <section class="hero" aria-labelledby="hero-title">
-      <a href={portrait.src} class="portrait-link" data-lightbox data-media-kind="portrait" data-media-width={portrait.width} data-media-height={portrait.height} data-title={t(locale, 'portrait-title')} aria-label={t(locale, 'open-image', { title: t(locale, 'portrait-title') })}><Media source={portrait} locale={locale} kind="portrait" alt={t(locale, 'portrait-title')} width={640} height={640} widths={[240, 320, 480, 640]} sizes="(max-width: 445px) 70vw, 312px" eager /></a>
+      <a href={portrait.src} class="portrait-link" data-lightbox data-media-kind="portrait" data-media-width={portrait.width} data-media-height={portrait.height} data-title={t(locale, 'portrait-title')} aria-label={t(locale, 'open-image', { title: t(locale, 'portrait-title') })}><Media source={portrait} locale={locale} portrait alt={t(locale, 'portrait-title')} width={640} height={640} widths={[240, 320, 480, 640]} sizes="(max-width: 445px) 70vw, 312px" eager /></a>
       <h1 id="hero-title">{t(locale, 'my-name')}</h1><p>{t(locale, 'hero-desc')}</p>
     </section>
     <section id="education" class="section" aria-labelledby="education-title"><h2 class="section-title" id="education-title">{t(locale, 'sec-edu')}</h2><Timeline locale={locale} entries={education} /></section>

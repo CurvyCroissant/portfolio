@@ -1,5 +1,6 @@
 ---
 import Layout from '../layouts/Layout.astro';
+import Icon from './Icon.astro';
 import ImageCard from './ImageCard.astro';
 import type { Project } from '../data/projects';
 import { t, type Locale } from '../lib/i18n';
@@ -14,7 +15,7 @@ const { locale, project } = Astro.props;
       <section class="content-block" aria-labelledby="problem-title" data-reveal><h2 id="problem-title">{t(locale, 'prob-label')}</h2><p>{t(locale, project.problemKey)}</p></section>
       <section class="content-block" aria-labelledby="solution-title" data-reveal><h2 id="solution-title">{t(locale, 'sol-label')}</h2><p>{t(locale, project.solutionKey)}</p></section>
     </div>
-    <section class="content-block impact-block" aria-labelledby="impact-title" data-reveal><h2 id="impact-title">{t(locale, 'imp-label')}</h2><p>{t(locale, project.impactKey)}</p>{project.repository && <a href={project.repository} target="_blank" rel="noopener noreferrer" class="repo-link">{t(locale, 'view-repo')}</a>}</section>
+    <section class="content-block impact-block" aria-labelledby="impact-title" data-reveal><h2 id="impact-title">{t(locale, 'imp-label')}</h2><p>{t(locale, project.impactKey)}</p>{project.repository && <a href={project.repository} target="_blank" rel="noopener noreferrer" class="repo-link"><Icon name="github" />{t(locale, 'view-repo')}</a>}</section>
     <section aria-labelledby="gallery-title"><h2 class="gallery-title" id="gallery-title">{t(locale, 'gal-label')}</h2><div class="cert-grid">{project.gallery.map(image => <ImageCard locale={locale} image={image.image} caption={t(locale, image.captionKey)} position={image.position} />)}</div></section>
   </main>
 </Layout>

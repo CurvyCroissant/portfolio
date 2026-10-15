@@ -103,6 +103,8 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
     const element = (event.target as HTMLElement).closest<HTMLElement>('.skill-pill');
     const item = bodies.find(body => body.element === element);
     if (!item || !element) return;
+    event.preventDefault();
+    window.getSelection()?.removeAllRanges();
     const point = coordinates(event);
     // Sleeping neighbours must participate before the first constraint solve.
     wake();

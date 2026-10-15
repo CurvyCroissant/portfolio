@@ -1,8 +1,9 @@
 import type { ClientCopy } from '../lib/i18n';
 import { updateScrollLock } from './preferences';
+import type { PageScope } from './lifecycle';
 import { motionDuration, motionEase, reducedMotion } from './motion';
 
-export function setupLightbox(copy: ClientCopy) {
+export function setupLightbox(copy: ClientCopy, scope: PageScope) {
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
   const stage = document.querySelector<HTMLElement>('#lightbox-stage');
   const media = document.querySelector<HTMLElement>('#lightbox-media');
@@ -69,8 +70,8 @@ export function setupLightbox(copy: ClientCopy) {
     }
     if (dialog.open) dialog.close();
   };
-  dialog.addEventListener('cancel', event => { event.preventDefault(); void close(); });
-  dialog.addEventListener('close', () => {
+  scope.on(dialog, 'cancel', event => { event.preventDefault(); void close(); });
+  scope.on(dialog, 'close', () => {
     stopAnimation();
     if (frame !== undefined) cancelAnimationFrame(frame);
     frame = undefined;
@@ -85,7 +86,7 @@ export function setupLightbox(copy: ClientCopy) {
     opener?.focus({ preventScroll: true });
   });
 
-  document.querySelectorAll<HTMLAnchorElement>('[data-lightbox]').forEach(trigger => trigger.addEventListener('click', event => {
+  document.querySelectorAll<HTMLAnchorElement>('[data-lightbox]').forEach(trigger => scope.on(trigger, 'click', event => {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || document.querySelector('dialog[open]')) return;
     event.preventDefault();
     opener = trigger;
@@ -100,7 +101,6 @@ export function setupLightbox(copy: ClientCopy) {
     media.dataset.mediaState = 'loading'; media.setAttribute('aria-busy', 'true');
     media.style.transition = 'none';
     media.style.borderRadius = '12px';
-    loader.querySelectorAll<HTMLElement>('[data-skeleton-kind]').forEach(skeleton => { skeleton.hidden = skeleton.dataset.skeletonKind !== (trigger.dataset.mediaKind || 'screenshot'); });
     status.textContent = copy['image-loading'];
     dialog.showModal(); updateScrollLock();
     fitImage();
@@ -136,19 +136,19 @@ export function setupLightbox(copy: ClientCopy) {
     zoom = next;
     requestRender();
   };
-  stage.addEventListener('wheel', event => {
+  scope.on(stage, 'wheel', event => {
     if (!dialog.open || closing) return;
     event.preventDefault();
     const cursor = point(event.clientX, event.clientY);
     setZoom(zoom + (event.deltaY < 0 ? .15 : -.15), cursor.x, cursor.y);
   }, { passive: false });
-  stage.addEventListener('dblclick', event => {
+  scope.on(stage, 'dblclick', event => {
     const box = media.getBoundingClientRect();
     if (image.hidden || event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) return;
     const cursor = point(event.clientX, event.clientY);
     setZoom(zoom > 1 ? 1 : 2, cursor.x, cursor.y);
   });
-  stage.addEventListener('pointerdown', event => {
+  scope.on(stage, 'pointerdown', event => {
     if (closing || event.button > 0) return;
     if (!pointers.size) moved = false;
     pointers.set(event.pointerId, { x: event.clientX, y: event.clientY, startX: event.clientX, startY: event.clientY });
@@ -162,7 +162,7 @@ export function setupLightbox(copy: ClientCopy) {
       pinch = { distance: Math.max(1, Math.hypot(a.x - b.x, a.y - b.y)), zoom, x: center.x, y: center.y, panX, panY };
     }
   });
-  stage.addEventListener('pointermove', event => {
+  scope.on(stage, 'pointermove', event => {
     const previous = pointers.get(event.pointerId);
     if (!previous || closing) return;
     if (Math.hypot(event.clientX - previous.startX, event.clientY - previous.startY) > 4) moved = true;
@@ -177,21 +177,30 @@ export function setupLightbox(copy: ClientCopy) {
     if (moved && zoom > 1) requestRender();
   });
   const release = (event: PointerEvent) => { pointers.delete(event.pointerId); if (!pointers.size && zoom > 1) requestRender(); };
-  stage.addEventListener('pointerup', release);
-  stage.addEventListener('pointercancel', release);
-  stage.addEventListener('lostpointercapture', release);
+  scope.on(stage, 'pointerup', release);
+  scope.on(stage, 'pointercancel', release);
+  scope.on(stage, 'lostpointercapture', release);
   // Pointer capture retargets clicks to the stage; use coordinates to distinguish the image.
-  stage.addEventListener('click', event => {
+  scope.on(stage, 'click', event => {
     const box = media.getBoundingClientRect();
     const outside = event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom;
     if (!moved && (outside || image.hidden)) void close();
   });
-  document.addEventListener('keydown', event => {
+  scope.on(document, 'keydown', event => {
     if (!dialog.open || closing || event.ctrlKey || event.metaKey || event.altKey) return;
     if (event.key === '+' || event.key === '=') { event.preventDefault(); setZoom(zoom + .25); }
     if (event.key === '-') { event.preventDefault(); setZoom(zoom - .25); }
     if (event.key === '0') { event.preventDefault(); panX = panY = 0; setZoom(1); }
   });
-  new ResizeObserver(fitImage).observe(stage);
-  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) animation?.finish(); });
+  const resize = new ResizeObserver(fitImage);
+  resize.observe(stage);
+  scope.add(() => {
+    request++; closing = true;
+    stopAnimation(); resize.disconnect();
+    if (frame !== undefined) cancelAnimationFrame(frame);
+    image.onload = image.onerror = null; image.removeAttribute('src');
+    if (dialog.open) dialog.close();
+    updateScrollLock();
+  });
+  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });
 }

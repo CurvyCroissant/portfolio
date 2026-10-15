@@ -185,7 +185,8 @@ test('repeated copy always uses the address and announces success', async ({ pag
   await page.locator('#copy-email').click();
   expect(await page.evaluate(() => window.__copies)).toEqual([site.email, site.email]);
   await expect(page.locator('#copy-status')).toHaveText(messages.copied.id);
-  await expect(page.locator('a[href^="mailto:"]')).toHaveAttribute('href', `mailto:${site.email}`);
+  await expect(page.locator('a[href^="mailto:"]')).toHaveCount(0);
+  await expect(page.locator('#copy-email')).toHaveText(site.email);
 });
 
 test('copy failure announces failure', async ({ page }) => {

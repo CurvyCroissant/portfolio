@@ -23,8 +23,8 @@ export interface TimelineEntry {
 }
 
 export const education: TimelineEntry[] = [
-  { title: 'BINUS University', subtitleKey: 'edu-binus-sub', descriptionKey: 'edu-binus-desc', start: '2023-09' },
-  { title: 'Shibaura Institute of Technology', subtitleKey: 'edu-sit-sub', descriptionKey: 'edu-sit-desc', start: '2026-04', end: '2026-07', certificate: 'certificates/sit-matriculation.jpg', rotation: 90 },
+  { title: 'BINUS University', titleKey: 'inst-binus', subtitleKey: 'edu-binus-sub', descriptionKey: 'edu-binus-desc', start: '2023-09' },
+  { title: 'Shibaura Institute of Technology', titleKey: 'inst-sit', subtitleKey: 'edu-sit-sub', descriptionKey: 'edu-sit-desc', start: '2026-04', end: '2026-07', certificate: 'certificates/sit-matriculation.jpg', rotation: 90 },
   { title: 'SMAK 1 BPK PENABUR Jakarta', subtitleKey: 'edu-smak-sub', descriptionKey: 'edu-smak-desc', start: '2020-07', end: '2023-06' },
 ];
 
@@ -49,7 +49,8 @@ export const skills: Skill[] = [
   ...['Python', 'C', 'PHP', 'JavaScript', 'Swift', 'HTML', 'CSS'].map(label => ({ label, category: 'skill-languages' as const, featured: true })),
   ...['MySQL', 'Laravel', 'Streamlit', 'Firebase', 'React', 'Astro'].map(label => ({ label, category: 'skill-web' as const, featured: ['MySQL', 'Laravel'].includes(label) })),
   ...['PyTorch', 'Scikit-Learn', 'YOLOv8', 'HuggingFace', 'MediaPipe', 'OpenCV'].map(label => ({ label, category: 'skill-ai' as const })),
-  ...['Git', 'NLTK', 'Pandas', 'NumPy', 'Data Analytics'].map(label => ({ label, category: 'skill-tools' as const })),
+  ...['Git', 'NLTK', 'Pandas', 'NumPy'].map(label => ({ label, category: 'skill-tools' as const })),
+  { label: 'Data Analytics', translation: 'skill-data', category: 'skill-tools' },
   { label: 'Machine Learning', translation: 'skill-ml', category: 'skill-specialties', featured: true },
   { label: 'Computer Vision', translation: 'skill-cv', category: 'skill-specialties', featured: true },
   { label: 'Web Development', translation: 'skill-wd', category: 'skill-specialties', featured: true },

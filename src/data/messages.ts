@@ -60,11 +60,11 @@ export const messages = {
   },
   "ctx-label": {
     "id": "Konteks",
-    "ja": "コンテキスト",
+    "ja": "制作の背景",
     "en": "Context"
   },
   "ts-label": {
-    "id": "Tech Stack",
+    "id": "Teknologi yang Digunakan",
     "ja": "技術スタック",
     "en": "Tech Stack"
   },
@@ -80,7 +80,7 @@ export const messages = {
   },
   "imp-label": {
     "id": "Dampak",
-    "ja": "インパクト",
+    "ja": "成果",
     "en": "Impact"
   },
   "gal-label": {
@@ -90,12 +90,12 @@ export const messages = {
   },
   "ctx-ac": {
     "id": "Proyek Akademik",
-    "ja": "学術プロジェクト",
+    "ja": "学業でのプロジェクト",
     "en": "Academic Project"
   },
   "ctx-pe": {
     "id": "Proyek Pribadi",
-    "ja": "個人プロジェクト",
+    "ja": "個人制作プロジェクト",
     "en": "Personal Project"
   },
   "my-name": {
@@ -104,17 +104,17 @@ export const messages = {
     "en": "Aaron Nathanael"
   },
   "hero-desc": {
-    "id": "Mahasiswa S1 Ilmu Komputer tahun ke-4 di BINUS University. Saat ini sedang magang sebagai Application Developer di PT Bank Central Asia Tbk. Aktif mempelajari cara teknologi diimplementasikan dalam skenario bisnis dunia nyata.",
-    "ja": "ビヌス大学のコンピュータサイエンス学部4年生。現在、PT Bank Central Asia Tbkでアプリケーション開発インターンとして勤務。現実のビジネスシナリオでテクノロジーがどのように実装されているかを積極的に学んでいます。",
+    "id": "Mahasiswa S1 Ilmu Komputer tahun keempat di BINUS University. Saat ini sedang magang sebagai Pengembang Aplikasi di PT Bank Central Asia Tbk. Aktif mempelajari penerapan teknologi dalam situasi bisnis nyata.",
+    "ja": "ビヌス大学でコンピュータサイエンスを学ぶ学部4年生です。現在、PT Bank Central Asia Tbkでアプリケーション開発のインターンとして勤務しています。実際のビジネスの現場で技術がどのように活用されるかを積極的に学んでいます。",
     "en": "4th-year Computer Science undergraduate at BINUS University. Currently interning as an Application Developer at PT Bank Central Asia Tbk. Actively learning ways tech is implemented in real-world business scenarios."
   },
   "exp-bca": {
-    "id": "Application Developer Intern",
+    "id": "Magang Pengembang Aplikasi",
     "ja": "アプリケーション開発インターン",
     "en": "Application Developer Intern"
   },
   "exp-bca-desc": {
-    "id": "Bekerja di tim iOS Development yang bertanggung jawab untuk terus mengembangkan dan memelihara aplikasi Merchant BCA.",
+    "id": "Bekerja dalam tim pengembangan iOS yang bertanggung jawab atas pengembangan dan pemeliharaan aplikasi Merchant BCA secara berkelanjutan.",
     "ja": "iOS開発チームに所属し、Merchant BCAアプリケーションの継続的な開発と保守を担当しています。",
     "en": "Working in the iOS Development team responsible for continuously developing and maintaining the Merchant BCA application."
   },
@@ -124,28 +124,28 @@ export const messages = {
     "en": "Tour Guide"
   },
   "exp-guide-desc": {
-    "id": "Memandu tur Museum Ghibli di Mitaka, Tokyo. Tur dilakukan sepenuhnya dalam bahasa Inggris dan bahasa Jepang dasar. Sebagian besar tamu adalah penutur bahasa Inggris yang bepergian di Jepang.",
-    "ja": "東京・三鷹のジブリ美術館でツアーを案内。ツアーはすべて英語と基礎的な日本語で行われました。ゲストは主に日本を旅行中の英語圏の方々でした。",
+    "id": "Memandu tur Museum Ghibli di Mitaka, Tokyo. Tur dilaksanakan sepenuhnya dalam bahasa Inggris dan bahasa Jepang dasar. Sebagian besar tamu adalah penutur bahasa Inggris yang sedang berwisata di Jepang.",
+    "ja": "東京・三鷹のジブリ美術館でツアーガイドを務めました。案内はすべて英語と基礎的な日本語で行い、参加者の多くは日本を旅行中の英語を話す方々でした。",
     "en": "Lead tours of the Ghibli Museum in Mitaka, Tokyo. The tours were conducted entirely in English and basic Japanese. The guests were mostly English-speakers traveling in Japan."
   },
   "exp-aca": {
     "id": "Aktivis Acara Akademik",
-    "ja": "学術イベント推進メンバー",
+    "ja": "学術イベント運営メンバー",
     "en": "Academic Events Activist"
   },
   "exp-aca-desc": {
-    "id": "Bekerja dalam tim, berbasis proyek, untuk membuat dan melaksanakan acara HIMTI.",
-    "ja": "プロジェクトベースでチームと協力し、HIMTIのイベントを企画・実行しました。",
+    "id": "Bekerja dalam tim berbasis proyek untuk merancang dan menyelenggarakan acara HIMTI.",
+    "ja": "プロジェクトごとにチームで協力し、HIMTIのイベントを企画・運営しました。",
     "en": "Worked in teams, based on projects, to create and carry out HIMTI events."
   },
   "exp-web": {
-    "id": "Aktivis Web Development",
-    "ja": "ウェブ開発推進メンバー",
+    "id": "Aktivis Pengembangan Web",
+    "ja": "ウェブ開発メンバー",
     "en": "Web Development Activist"
   },
   "exp-web-desc": {
-    "id": "Bekerja dalam tim, berbasis proyek, untuk mengembangkan frontend situs web HIMTI menggunakan HTML, CSS, dan JS.",
-    "ja": "プロジェクトベースでチームと協力し、HTML、CSS、JSを使用してHIMTIウェブサイトのフロントエンドを開発しました。",
+    "id": "Bekerja dalam tim berbasis proyek untuk mengembangkan antarmuka situs web HIMTI menggunakan HTML, CSS, dan JavaScript.",
+    "ja": "プロジェクトごとにチームで協力し、HTML、CSS、JavaScriptを使用してHIMTIのウェブサイトのフロントエンドを開発しました。",
     "en": "Worked in teams, based on projects, to develop the frontend of HIMTI websites using HTML, CSS, and JS."
   },
   "exp-sic": {
@@ -155,17 +155,17 @@ export const messages = {
   },
   "exp-sic-desc": {
     "en": "Completed the intensive bootcamps for AI/ML, Python, and IoT. Delivered \"SafeFall\", a real-time fall detection app using YOLO computer vision models. Reached the semi-finals among the top {sicSemiFinalists} of {sicParticipants} participants.",
-    "id": "Menyelesaikan bootcamp intensif untuk AI/ML, Python, dan IoT. Membangun \"SafeFall\", aplikasi deteksi jatuh real-time menggunakan model visi komputer YOLO. Mencapai babak semi-final sebagai {sicSemiFinalists} terbaik dari {sicParticipants} peserta.",
-    "ja": "AI/ML、Python、IoTの集中ブートキャンプを修了。YOLOモデルを使用したリアルタイム転倒検知アプリ「SafeFall」を開発。{sicParticipants}人の参加者の中からトップ{sicSemiFinalists}としてセミファイナルに進出。"
+    "id": "Menyelesaikan pelatihan intensif AI/ML, Python, dan IoT. Mengembangkan \"SafeFall\", aplikasi deteksi jatuh secara real-time menggunakan model visi komputer YOLO. Lolos ke babak semifinal sebagai salah satu dari {sicSemiFinalists} peserta terbaik dari total {sicParticipants} peserta.",
+    "ja": "AI・機械学習、Python、IoTの集中講座を修了しました。YOLOのコンピュータビジョンモデルを使用したリアルタイム転倒検知アプリ「SafeFall」を開発し、参加者{sicParticipants}名中、上位{sicSemiFinalists}名の準決勝進出者に選ばれました。"
   },
   "exp-bncc": {
     "id": "Aktivis Pembelajaran & Pelatihan",
-    "ja": "学習・トレーニング推進メンバー",
+    "ja": "学習・研修運営メンバー",
     "en": "Learning & Training Activist"
   },
   "exp-bncc-desc": {
-    "id": "Bekerja dalam tim, berbasis proyek, untuk merencanakan dan membuat modul pembelajaran ilmu komputer yang komprehensif untuk mahasiswa.",
-    "ja": "プロジェクトベースでチームと協力し、大学生向けの包括的なコンピュータサイエンス学習モジュールを計画および作成しました。",
+    "id": "Bekerja dalam tim berbasis proyek untuk merencanakan dan menyusun modul pembelajaran ilmu komputer yang menyeluruh bagi mahasiswa.",
+    "ja": "プロジェクトごとにチームで協力し、大学生向けの体系的なコンピュータサイエンス学習教材を企画・作成しました。",
     "en": "Worked in teams, based on project, to plan out and create comprehensive computer science learning modules for university students."
   },
   "exp-ios": {
@@ -174,8 +174,8 @@ export const messages = {
     "en": "Participant"
   },
   "exp-ios-desc": {
-    "id": "Bekerja dalam tim untuk mengembangkan aplikasi seluler iOS berbasis AR yang dapat memproyeksikan desain rumah tradisional Bali ke permukaan dunia nyata.",
-    "ja": "チームで協力し、現実世界の表面に伝統的なバリの家のデザインを投影できるARベースのiOSモバイルアプリを開発しました。",
+    "id": "Bekerja dalam tim untuk mengembangkan aplikasi iOS berbasis AR yang dapat memproyeksikan desain rumah tradisional Bali pada permukaan di dunia nyata.",
+    "ja": "チームで協力し、バリの伝統的な住宅デザインを現実の空間の表面に投影できるARベースのiOSアプリを開発しました。",
     "en": "Worked in a team to develop an AR-based iOS mobile app which is able to project traditional Balinese house designs onto real-world surfaces."
   },
   "edu-sit-sub": {
@@ -184,28 +184,28 @@ export const messages = {
     "en": "Student Exchange Program"
   },
   "edu-sit-desc": {
-    "id": "Pertukaran pelajar di Shibaura Institute of Technology, Tokyo. Mempelajari tentang teknik di Jepang, serta berkomunikasi dan bekerja dengan orang-orang dari budaya dan latar belakang yang sangat berbeda.",
-    "ja": "東京の芝浦工業大学で交換留学。日本のエンジニアリングについて学び、全く異なる文化や背景を持つ人々とのコミュニケーションや協働を経験しました。",
+    "id": "Mengikuti pertukaran pelajar di Shibaura Institute of Technology, Tokyo. Mempelajari bidang teknik di Jepang serta cara berkomunikasi dan bekerja sama dengan orang-orang dari budaya dan latar belakang yang sangat berbeda.",
+    "ja": "東京の芝浦工業大学に交換留学しました。日本の工学を学ぶとともに、文化や背景が大きく異なる人々とのコミュニケーションや協働について学びました。",
     "en": "Exchanged at Shibaura Institute of Technology, Tokyo. Learned about engineering in Japan, as well as communicating and working with people with very different culture and backgrounds."
   },
   "edu-binus-sub": {
     "id": "S1 Ilmu Komputer",
-    "ja": "コンピュータサイエンス学士",
+    "ja": "コンピュータサイエンス学士課程",
     "en": "Bachelor of Computer Science"
   },
   "edu-binus-desc": {
-    "id": "Mahasiswa S1 Ilmu Komputer dengan IPK kumulatif {gpa}. Tergabung dalam Global Class Program, yang berarti seluruh materi diberikan dalam bahasa Inggris, beserta satu semester Pertukaran Pelajar Internasional. Saat ini mendalami iOS App Development, Full-Stack Web Development, dan Machine Learning.",
-    "ja": "累積GPA {gpa}のコンピュータサイエンス学部生。グローバルクラスプログラムに在籍し、すべての教材が英語で提供されるほか、1学期分の国際交換留学も含まれます。現在、iOSアプリ開発、フルスタックウェブ開発、機械学習を専攻しています。",
+    "id": "Mahasiswa S1 Ilmu Komputer dengan IPK kumulatif {gpa}. Mengikuti Global Class Program, yang menyediakan seluruh materi dalam bahasa Inggris serta satu semester pertukaran pelajar internasional. Saat ini mendalami pengembangan aplikasi iOS, pengembangan web full-stack, dan pembelajaran mesin.",
+    "ja": "累積GPA {gpa}のコンピュータサイエンス学部生です。すべての学習資料が英語で提供され、1学期間の国際交換留学も含まれるグローバルクラスプログラムに在籍しています。現在はiOSアプリ開発、フルスタックのウェブ開発、機械学習の学習に取り組んでいます。",
     "en": "Computer Science undergraduate with a cumulative GPA of {gpa}. In the Global Class Program, meaning that all the material is provided in English, along with one semester of International Study Exchange. Currently pursuing iOS App Development, Full-Stack Web Development, and Machine Learning."
   },
   "edu-smak-sub": {
     "id": "Ijazah SMA",
-    "ja": "高校卒業証明",
+    "ja": "高校卒業資格",
     "en": "High School Diploma"
   },
   "edu-smak-desc": {
     "id": "Sekolah menengah atas jurusan Matematika dan Ilmu Pengetahuan Alam (MIPA).",
-    "ja": "数学・自然科学（MIPA）を専攻する普通科高校。",
+    "ja": "高校では数学・自然科学（MIPA）を専攻しました。",
     "en": "General high school in the Mathematics and Natural Sciences (MIPA) major."
   },
   "ach-dl": {
@@ -220,11 +220,11 @@ export const messages = {
   },
   "ach-gj": {
     "id": "Juara 3 Game Jam",
-    "ja": "Game Jam 3位",
+    "ja": "ゲームジャム第3位",
     "en": "2nd Runner-Up Game Jam"
   },
   "ach-sic": {
-    "id": "Semi Finalis",
+    "id": "Semifinalis",
     "ja": "セミファイナリスト",
     "en": "Semi Finalist"
   },
@@ -244,22 +244,22 @@ export const messages = {
     "en": "Posture detection web app using webcam."
   },
   "pa-prob": {
-    "id": "Postur yang buruk menyebabkan sakit punggung, namun alat fisik mengganggu. Perangkat lunak sering gagal jika pengguna memakai headphone atau memiliki latar belakang yang ramai.",
+    "id": "Membungkuk menyebabkan nyeri punggung, tetapi alat koreksi postur fisik tidak nyaman dipakai. Ada alternatif perangkat lunak, tetapi biasanya tidak berfungsi dengan baik jika pengguna memakai headphone atau memiliki latar belakang visual yang ramai.",
     "ja": "猫背は背中の痛みの原因になりますが、物理的な姿勢矯正器具は煩わしいものです。ソフトウェアの代替品もありますが、ヘッドフォンを使用していたり、背景が複雑だと正常に動作しないことがよくあります。",
     "en": "Slouching causes back pain, but physical posture correctors are annoying to wear. Software alternatives exist, but they usually break if the user wears headphones or has a busy background."
   },
   "pa-sol": {
-    "id": "Aplikasi web dibangun untuk melacak postur menggunakan webcam biasa. Untuk masalah headphone, pelacakan dipetakan ke mata, bukan telinga. Kalibrasi ditambahkan untuk mengunci ukuran dan mengabaikan latar belakang.",
-    "ja": "一般的なウェブカメラを使用して姿勢を追跡するウェブアプリを構築しました。ヘッドフォンの問題を解決するため、耳ではなく目の座標にマッピングしました。また、ユーザーのサイズをロックし、背景の動きを無視するキャリブレーション機能を追加しました。",
+    "id": "Aplikasi web dibangun untuk memantau postur menggunakan webcam biasa. Untuk mengatasi masalah headphone, pelacakan menggunakan koordinat mata, bukan telinga. Tahap kalibrasi ditambahkan untuk menyesuaikan pelacakan dengan ukuran tubuh pengguna dan mengabaikan gerakan di latar belakang.",
+    "ja": "一般的なウェブカメラで姿勢を追跡するウェブアプリを構築しました。ヘッドホンによる問題を解決するため、耳ではなく目の座標を追跡します。さらに、ユーザーの体の大きさに合わせて追跡を固定し、背景の動きを無視するキャリブレーション機能を追加しました。",
     "en": "A web app was built to track posture using a regular webcam. To fix the headphone issue, tracking was mapped to eye coordinates instead of ears. A calibration step was added to lock onto the user's size and ignore background movement."
   },
   "pa-imp": {
-    "id": "Monitor postur gratis tanpa perangkat keras yang bekerja dengan baik. Sistem mengingatkan pengguna saat membungkuk dan menyediakan data yang dapat diekspor.",
-    "ja": "追加のハードウェアを必要としない、無料で実用的な姿勢モニターです。猫背になったときにユーザーに警告し、習慣データをエクスポートできます。",
+    "id": "Alat pemantau postur gratis yang tidak memerlukan perangkat keras tambahan dan dapat digunakan dalam kondisi nyata. Sistem memperingatkan pengguna saat membungkuk dan menyediakan data kebiasaan selama sesi yang dapat diekspor.",
+    "ja": "追加のハードウェアを必要とせず、実際の利用環境で動作する無料の姿勢モニターです。猫背になった際に警告し、セッション中の姿勢の習慣に関するデータをエクスポートできます。",
     "en": "A free, zero-hardware posture monitor that works in real-world conditions. It alerts the user when they slouch and provides exportable data on their session habits."
   },
   "pa-gal-1": {
-    "id": "Deteksi Bungkuk",
+    "id": "Deteksi Postur Membungkuk",
     "ja": "猫背の検知",
     "en": "Slouch Detection"
   },
@@ -269,7 +269,7 @@ export const messages = {
     "en": "Occlusion Handling"
   },
   "pa-gal-3": {
-    "id": "Penyaringan Latar",
+    "id": "Penyaringan Latar Belakang",
     "ja": "背景フィルタリング",
     "en": "Background Filtering"
   },
@@ -280,26 +280,26 @@ export const messages = {
   },
   "proj-cd-title": {
     "id": "Pembuat Dokumentasi Kode",
-    "ja": "コード仕様書自動生成",
+    "ja": "コードドキュメント生成ツール",
     "en": "Code Documentation Generator"
   },
   "proj-cd-desc": {
-    "id": "Aplikasi web dan CLI pembuat dokumentasi Python.",
-    "ja": "Pythonドキュメント生成ウェブアプリおよびCLI。",
+    "id": "Aplikasi web dan antarmuka baris perintah (CLI) untuk menghasilkan dokumentasi kode Python.",
+    "ja": "Pythonコードのドキュメントを生成するウェブアプリとコマンドラインツール（CLI）。",
     "en": "Python documentation generator web app and CLI."
   },
   "cd-prob": {
-    "id": "Menulis dokumentasi itu membosankan. Alat AI yang ada sering berhalusinasi, membuat variabel yang tidak ada, atau berbayar via API cloud.",
+    "id": "Menulis dokumentasi membutuhkan pekerjaan yang berulang dan membosankan. Alat AI yang ada sering berhalusinasi dengan menyebut variabel yang sebenarnya tidak ada dalam kode, atau memerlukan biaya untuk digunakan melalui API cloud.",
     "ja": "ドキュメントの作成は面倒です。既存のAIツールはコードに存在しない変数を捏造（ハルシネーション）したり、クラウドAPI経由で使用するとコストがかかることがよくあります。",
     "en": "Writing documentation is tedious. Existing AI tools often hallucinate, making up variables that don't exist in the code, or they cost money to use via cloud APIs."
   },
   "cd-sol": {
-    "id": "Alat Python lokal dibuat menggunakan model Qwen2.5. Dengan menerapkan output JSON, respons bertele-tele dihindari. Validasi ditambahkan untuk memeriksa output AI dengan AST kode asli untuk memblokir parameter palsu.",
-    "ja": "Qwen2.5モデルを使用してローカルファーストのPythonツールを作成しました。JSON出力を厳格に適用することで、不要な応答を回避します。AIの出力を実際のコードの抽象構文木（AST）と照合する検証ステップを追加し、偽のパラメータを完全にブロックしました。",
+    "id": "Alat Python yang mengutamakan pemrosesan lokal dibuat menggunakan model Qwen2.5. Format keluaran JSON diterapkan secara ketat untuk menghindari respons bertele-tele. Tahap validasi ditambahkan untuk mencocokkan keluaran AI dengan pohon sintaks abstrak (AST) kode asli, sehingga parameter yang tidak ada dalam kode dapat sepenuhnya diblokir.",
+    "ja": "Qwen2.5を使用し、ローカルでの実行を重視したPythonツールを作成しました。出力を厳密にJSON形式に限定することで、冗長な応答を防ぎます。AIの出力を実際のコードの抽象構文木（AST）と照合し、存在しないパラメーターを完全に排除する検証処理を追加しました。",
     "en": "A local-first Python tool was created using the Qwen2.5 model. By strictly enforcing JSON outputs, it avoids chatty responses. A validation step was added to check the AI's output against the actual code's Abstract Syntax Tree (AST) to completely block fake parameters."
   },
   "cd-imp": {
-    "id": "Docstring cepat, gratis, dan akurat dihasilkan dalam 5-20 detik per file tanpa koneksi internet. Kualitas output diverifikasi dengan tolok ukur NLP seperti BLEU dan ROUGE-L.",
+    "id": "Menghasilkan docstring secara cepat, gratis, dan akurat dalam 5–20 detik per berkas tanpa memerlukan koneksi internet. Kualitas keluarannya diverifikasi menggunakan tolok ukur standar pemrosesan bahasa alami (NLP), seperti BLEU dan ROUGE-L.",
     "ja": "インターネット接続なしで、1ファイルあたり5〜20秒で高速、無料、正確なDocstringを生成します。出力品質は、BLEUやROUGE-Lなどの標準的なNLPベンチマークで検証されました。",
     "en": "Fast, free, and accurate docstrings generated in 5-20 seconds per file without needing an internet connection. The output quality was verified using standard NLP benchmarks like BLEU and ROUGE-L."
   },
@@ -309,7 +309,7 @@ export const messages = {
     "en": "Web Interface"
   },
   "cd-gal-2": {
-    "id": "Output Tervalidasi",
+    "id": "Keluaran Tervalidasi",
     "ja": "検証済みの出力",
     "en": "Validated Outputs"
   },
@@ -324,19 +324,19 @@ export const messages = {
     "en": "Fall detection web app."
   },
   "sf-prob": {
-    "id": "Deteksi jatuh lansia biasanya bergantung pada smartwatch. Sayangnya, perangkat ini mudah terlupa, dilepas untuk diisi daya, atau dihindari oleh pengguna yang paling membutuhkannya.",
+    "id": "Deteksi jatuh pada lansia biasanya bergantung pada smartwatch atau perangkat berbentuk kalung. Sayangnya, perangkat ini mudah terlupakan, dilepas untuk diisi daya, atau sengaja dihindari oleh pengguna yang paling membutuhkannya.",
     "ja": "高齢者の転倒検知は通常、スマートウォッチやペンダントに依存しています。しかし、これらのデバイスは忘れられやすく、充電のために外されたり、最も必要とするユーザーに敬遠されたりすることがよくあります。",
     "en": "Elderly fall detection usually relies on smartwatches or pendants. Unfortunately, these devices are easily forgotten, taken off to charge, or actively avoided by the users who need them most."
   },
   "sf-sol": {
-    "id": "Model visi komputer YOLOv8 dilatih untuk mendeteksi jatuh dari kamera standar. Ini melacak gerakan vertikal tiba-tiba dan mencatat setiap peristiwa dengan skor keyakinan, mengirim peringatan tanpa interaksi fisik.",
-    "ja": "一般的なカメラ映像から転倒を検知するために、YOLOv8コンピュータービジョンモデルを訓練しました。突然の垂直方向の動きを追跡し、各イベントを信頼度スコアと共に記録し、ユーザーとの物理的な接触なしにアラートを送信します。",
+    "id": "Model visi komputer YOLOv8 dilatih untuk mendeteksi jatuh dari rekaman kamera biasa. Sistem melacak gerakan vertikal mendadak, mencatat setiap kejadian beserta skor keyakinannya, dan mengirimkan peringatan tanpa memerlukan tindakan fisik dari pengguna.",
+    "ja": "一般的なカメラ映像から転倒を検知するYOLOv8コンピュータビジョンモデルを学習させました。急激な垂直方向の動きを追跡し、各イベントを信頼度スコアとともに記録します。ユーザーが操作しなくてもアラートを送信します。",
     "en": "A YOLOv8 computer vision model was trained to detect falls using standard camera feeds. It tracks sudden vertical movement and logs each event with a confidence score, sending alerts without any physical interaction from the user."
   },
   "sf-imp": {
     "en": "A non-intrusive safety net designed to work continuously in the background. SafeFall was selected as a semi-finalist in the Samsung Innovation Campus program, among the top {sicSemiFinalists} of {sicParticipants} participants.",
-    "id": "Jaring pengaman non-intrusif yang dirancang untuk bekerja terus-menerus di latar belakang. SafeFall terpilih sebagai semi-finalis Samsung Innovation Campus, di antara {sicSemiFinalists} terbaik dari {sicParticipants} peserta.",
-    "ja": "バックグラウンドで継続的に動作する、邪魔にならないセーフティネットです。SafeFallはSamsung Innovation Campusで、{sicParticipants}人の参加者の中からトップ{sicSemiFinalists}のセミファイナリストに選ばれました。"
+    "id": "Sistem perlindungan yang tidak mengganggu dan dirancang untuk bekerja terus-menerus di latar belakang. SafeFall terpilih sebagai semifinalis program Samsung Innovation Campus, sebagai salah satu dari {sicSemiFinalists} peserta terbaik dari total {sicParticipants} peserta.",
+    "ja": "利用者の妨げにならず、バックグラウンドで継続的に動作するよう設計された安全支援システムです。SafeFallはSamsung Innovation Campusで、参加者{sicParticipants}名中、上位{sicSemiFinalists}名の準決勝進出者に選ばれました。"
   },
   "sf-gal-1": {
     "id": "Jatuh Terdeteksi",
@@ -364,17 +364,17 @@ export const messages = {
     "en": "Public transport route planner web app."
   },
   "rp-prob": {
-    "id": "Transportasi publik bisa sangat tidak bisa diandalkan. Penumpang sering tidak tahu kapan bus akan tiba, dan sumber informasi terpusat jarang ada.",
-    "ja": "公共交通機関は時に非常に信頼性が低く、ストレスの原因となります。通勤者はバスが遅れているのか、正確にいつ到着するのかわからないことが多く、情報の一元化されたソースが存在することは稀です。",
+    "id": "Transportasi publik bisa tidak dapat diandalkan dan membuat penggunanya frustrasi. Penumpang sering tidak tahu apakah bus terlambat atau kapan tepatnya bus akan tiba, sementara sumber informasi yang terpusat jarang tersedia.",
+    "ja": "公共交通機関は運行が不安定で、利用者が不便を感じることがあります。バスが遅れているか、正確にいつ到着するかが分からないことが多く、こうした情報を一元的に確認できる場所もほとんどありません。",
     "en": "Public transport can be frustratingly unreliable. Commuters often don't know if a bus is delayed or exactly when it will arrive, and a single centralized source for this information rarely exists."
   },
   "rp-sol": {
-    "id": "Aplikasi full-stack dibangun dengan Laravel dan Leaflet.js. Aplikasi ini menarik GPS dari Firebase untuk pelacakan real-time. Sebagai cadangan jika koneksi terputus, aplikasi beralih ke jadwal statis di MySQL.",
+    "id": "Aplikasi full-stack dibangun menggunakan Laravel dan Leaflet.js. Aplikasi mengambil koordinat GPS terkini dari Firebase untuk pelacakan real-time. Agar tetap andal, sistem cadangan ditambahkan: jika koneksi langsung terputus, aplikasi secara otomatis beralih ke data jadwal statis di MySQL.",
     "ja": "LaravelとLeaflet.jsを使用してフルスタックアプリを構築しました。FirebaseからリアルタイムのGPS座標を取得して追跡します。さらに信頼性を高めるため、リアルタイム接続が切断された場合、自動的にMySQLの静的なスケジュールデータに切り替わるフォールバックシステムを追加しました。",
     "en": "A full-stack app was built using Laravel and Leaflet.js. It pulls live GPS coordinates from Firebase for real-time tracking. However, to make it truly reliable, a fallback system was added: if the live connection drops, it automatically defaults to static schedule data in MySQL."
   },
   "rp-imp": {
-    "id": "Memberikan ETA interaktif yang digambar di peta. Fitur tambahan menghitung peringkat ketepatan waktu historis untuk berbagai rute, membantu membuat keputusan komuter yang lebih baik.",
+    "id": "Menyediakan perkiraan waktu kedatangan (ETA) yang jelas dan interaktif, langsung pada peta. Fitur tambahan menghitung penilaian ketepatan waktu berdasarkan riwayat berbagai rute untuk membantu pengguna mengambil keputusan perjalanan yang lebih baik.",
     "ja": "地図上に直接描画される、明確でインタラクティブな到着予定時刻(ETA)をユーザーに提供します。また、様々なルートの過去の「定時運行」評価を計算する機能も追加し、人々の通勤の意思決定を支援します。",
     "en": "Provides users with clear, interactive ETAs drawn directly on a map. A feature was also added that calculates a historical 'on-time' rating for different routes, helping people make better commuting decisions."
   },
@@ -399,22 +399,22 @@ export const messages = {
     "en": "Agricultural yield predictive model."
   },
   "cy-prob": {
-    "id": "Memprediksi produksi pertanian sulit karena cuaca dan sumber daya bervariasi. Prediksi yang tidak akurat menyebabkan pemborosan sumber daya dan perencanaan keuangan yang buruk.",
-    "ja": "天候や資源の変動が激しいため、農場の生産量を予測することは困難です。不正確な予測は、資源の無駄遣いや農家の資金計画の失敗につながります。",
+    "id": "Memperkirakan hasil produksi pertanian sulit karena cuaca dan ketersediaan sumber daya sangat bervariasi. Prediksi yang tidak akurat menyebabkan pemborosan sumber daya dan perencanaan keuangan yang buruk bagi petani.",
+    "ja": "天候や資源の変動が大きいため、農場の生産量を予測することは困難です。不正確な予測は、資源の無駄遣いや農家の不適切な資金計画につながります。",
     "en": "Predicting how much a farm will produce is tough because weather and resources vary wildly. Inaccurate predictions lead to wasted resources and poor financial planning for farmers."
   },
   "cy-sol": {
-    "id": "Data pertanian mentah dibersihkan dan diproses. Lokasi dengan kardinalitas tinggi dikategorikan dengan One-Hot Encoding. Beberapa model ML diuji untuk menentukan prediksi hasil terbaik berdasarkan curah hujan, suhu, dan pestisida.",
-    "ja": "未加工の農業データをクリーニングして欠損値を処理し、高カーディナリティの場所をOne-Hotエンコーディングを使用して分類しました。その後、いくつかの機械学習モデルを比較し、降雨量、温度、農薬などの入力に基づいてどのモデルが最も正確に収穫量を予測できるかを決定しました。",
+    "id": "Data pertanian mentah dibersihkan dan diproses untuk menangani nilai yang hilang. Variabel lokasi dengan banyak kategori dikodekan menggunakan One-Hot Encoding. Beberapa model pembelajaran mesin kemudian dibandingkan untuk menentukan model dengan prediksi hasil panen terbaik berdasarkan masukan seperti curah hujan, suhu, dan pestisida.",
+    "ja": "農業の生データを整備して欠損値を処理し、カテゴリー数の多い所在地データをOne-Hotエンコーディングで表現しました。その後、複数の機械学習モデルを比較し、降雨量、気温、農薬などの入力から最も正確に収穫量を予測できるモデルを選びました。",
     "en": "Raw agricultural data was cleaned and processed to handle missing values, and high-cardinality locations were categorized using One-Hot Encoding. Several machine learning models were then benchmarked against each other to determine which predicted yields best based on inputs like rainfall, temperature, and pesticides."
   },
   "cy-imp": {
-    "id": "Model Gradient Boosting mencapai akurasi 96%. Simulasi dijalankan untuk mengidentifikasi cluster anomali dan menunjukkan bagaimana data ini digunakan untuk menargetkan pertanian berkinerja buruk, lengkap dengan perkiraan ROI.",
-    "ja": "最終的なGradient Boostingモデルは96%の精度を達成しました。また、異常なクラスタを特定し、このデータを活用してパフォーマンスの低い農場をターゲットにする方法を示すシミュレーションを実行し、推定される財務ROIも算出しました。",
+    "id": "Model Gradient Boosting akhir mencapai akurasi 96%. Simulasi juga dilakukan untuk mengidentifikasi kelompok anomali dan menunjukkan bagaimana data tersebut dapat digunakan untuk menargetkan pertanian berkinerja rendah, lengkap dengan perkiraan imbal hasil investasi (ROI).",
+    "ja": "最終的な勾配ブースティングモデルは96%の精度を達成しました。異常なクラスターを特定し、生産性の低い農場を対象にするためにデータをどう活用できるかを示すシミュレーションも行い、推定投資収益率（ROI）を算出しました。",
     "en": "The final Gradient Boosting model reached 96% accuracy. A simulation was also run to identify anomaly clusters and show how this data could be used to target underperforming farms, complete with an estimated financial ROI."
   },
   "cy-gal-1": {
-    "id": "Benchmarking Model",
+    "id": "Perbandingan Kinerja Model",
     "ja": "モデルのベンチマーク",
     "en": "Model Benchmarking"
   },
@@ -439,32 +439,32 @@ export const messages = {
     "en": "Personality trait predictor web app based on clothing."
   },
   "pp-prob": {
-    "id": "Tes kepribadian umumnya bergantung pada survei yang bias oleh bagaimana individu ingin dilihat. Tes ini kurang memiliki korelasi visual yang objektif terhadap presentasi nyata seseorang di dunia luar.",
+    "id": "Tes kepribadian biasanya bergantung pada survei laporan diri, yang secara inheren dipengaruhi oleh bagaimana seseorang ingin dipersepsikan. Tes ini tidak memiliki keterkaitan visual yang objektif dengan cara seseorang benar-benar menampilkan diri kepada orang lain.",
     "ja": "性格テストは伝統的に自己申告のアンケートに依存しており、個人が「どう見られたいか」によるバイアスが本質的に生じます。個人の実際の外見との客観的で視覚的な相関関係が欠けています。",
     "en": "Personality tests traditionally rely on self-reported surveys, which are inherently biased by how individuals wish to be perceived. They lack an objective, visual correlation to an individual's actual presentation to the outside world."
   },
   "pp-sol": {
-    "id": "Jaringan saraf PyTorch dikembangkan untuk menganalisis foto pakaian pengguna. Sistem mengekstrak fitur mode dan memprosesnya melalui model klasifikasi, memetakan pilihan pakaian visual ke sifat kepribadian OCEAN.",
+    "id": "Jaringan saraf PyTorch dikembangkan untuk menganalisis foto pakaian pengguna. Sistem mengekstrak fitur fesyen tertentu secara terprogram dan memprosesnya melalui model klasifikasi, lalu memetakan pilihan pakaian secara langsung ke lima dimensi kepribadian Big Five (OCEAN).",
     "ja": "ユーザーの服装写真を分析するためにPyTorchニューラルネットワークを開発しました。システムは特定のファッションの特徴をプログラム的に抽出し、分類モデルを通じて処理することで、視覚的な服装の選択をビッグファイブ（OCEAN）の性格特性に直接マッピングします。",
     "en": "A PyTorch neural network was developed to analyze photographs of user outfits. The system programmatically extracts specific fashion features and processes them through a classification model, mapping visual clothing choices directly to the Big Five (OCEAN) personality traits."
   },
   "pp-imp": {
-    "id": "Aplikasi web interaktif diterapkan, menggabungkan psikologi perilaku dengan visi komputer. Ini memberikan prediksi psikologis berbasis AI secara instan untuk dikontraskan dengan penilaian diri mereka sendiri.",
+    "id": "Aplikasi web interaktif diluncurkan dengan memadukan psikologi perilaku dan visi komputer. Aplikasi memberikan prediksi psikologis berbasis AI secara instan yang dapat dibandingkan dengan penilaian diri pengguna.",
     "ja": "行動心理学とコンピュータービジョンをシームレスに組み合わせたインタラクティブなウェブアプリケーションを展開しました。ユーザーの自己評価と比較できる、AI駆動の心理予測を即座に提供します。",
     "en": "An interactive web application was deployed, seamlessly combining behavioral psychology with computer vision. It provides users with instant, AI-driven psychological predictions to contrast against their own self-assessments."
   },
   "pp-gal-1": {
-    "id": "Unggah & Survei",
+    "id": "Unggah dan Survei",
     "ja": "アップロードとアンケート",
     "en": "Upload & Survey"
   },
   "pp-gal-2": {
-    "id": "Analisis Sifat AI",
+    "id": "Analisis Sifat dengan AI",
     "ja": "AI特性分析",
     "en": "AI Trait Analysis"
   },
   "pp-gal-3": {
-    "id": "Rincian Sifat",
+    "id": "Rincian Sifat Kepribadian",
     "ja": "特性の分析結果",
     "en": "Trait Breakdowns"
   },
@@ -491,7 +491,7 @@ export const messages = {
   "appearance-label": {
     "en": "Change appearance",
     "id": "Ubah tampilan",
-    "ja": "表示を切り替える"
+    "ja": "外観を切り替える"
   },
   "theme-to-dark": {
     "en": "Switch to dark appearance",
@@ -544,9 +544,9 @@ export const messages = {
     "ja": "画像を読み込み中…"
   },
   "image-error": {
-    "en": "The image could not be loaded. You can open the original image instead.",
-    "id": "Gambar tidak dapat dimuat. Anda dapat membuka gambar aslinya.",
-    "ja": "画像を読み込めませんでした。元の画像を開くことができます。"
+    "en": "The image could not be loaded. Please try again.",
+    "id": "Gambar tidak dapat dimuat. Silakan coba lagi.",
+    "ja": "画像を読み込めませんでした。もう一度お試しください。"
   },
   "open-original": {
     "en": "Open original image",
@@ -591,7 +591,7 @@ export const messages = {
   "command-unknown": {
     "en": "Unknown command: {command}. Type help to see available commands.",
     "id": "Perintah tidak dikenal: {command}. Ketik help untuk melihat perintah yang tersedia.",
-    "ja": "不明なコマンド：{command}。help と入力すると利用可能なコマンドを表示します。"
+    "ja": "不明なコマンド：{command}。help と入力すると利用可能なコマンドが表示されます。"
   },
   "terminal-updated": {
     "en": "Command output updated.",
@@ -615,7 +615,7 @@ export const messages = {
   },
   "copy-error": {
     "en": "Could not copy. Select the address to copy it manually.",
-    "id": "Tidak dapat menyalin. Pilih alamat untuk menyalinnya secara manual.",
+    "id": "Tidak dapat menyalin. Pilih alamat email untuk menyalinnya secara manual.",
     "ja": "コピーできませんでした。アドレスを選択して手動でコピーしてください。"
   },
   "email-label": {
@@ -631,7 +631,7 @@ export const messages = {
   "skill-languages": {
     "en": "Languages",
     "id": "Bahasa pemrograman",
-    "ja": "言語"
+    "ja": "プログラミング言語"
   },
   "skill-web": {
     "en": "Web development",
@@ -640,7 +640,7 @@ export const messages = {
   },
   "skill-ai": {
     "en": "AI and machine learning",
-    "id": "AI dan machine learning",
+    "id": "Kecerdasan buatan dan pembelajaran mesin",
     "ja": "AI・機械学習"
   },
   "skill-tools": {
@@ -655,7 +655,7 @@ export const messages = {
   },
   "skill-ml": {
     "en": "Machine Learning",
-    "id": "Machine Learning",
+    "id": "Pembelajaran Mesin",
     "ja": "機械学習"
   },
   "skill-cv": {
@@ -682,6 +682,41 @@ export const messages = {
     "en": "GPA",
     "id": "IPK",
     "ja": "GPA"
+  },
+  "page-loading": {
+    "en": "Loading page…",
+    "id": "Memuat halaman…",
+    "ja": "ページを読み込み中…"
+  },
+  "page-error": {
+    "en": "This page could not be loaded. Check your connection and try again.",
+    "id": "Halaman ini tidak dapat dimuat. Periksa koneksi Anda dan coba lagi.",
+    "ja": "ページを読み込めませんでした。接続を確認して、もう一度お試しください。"
+  },
+  "retry": {
+    "en": "Try again",
+    "id": "Coba lagi",
+    "ja": "再試行"
+  },
+  "go-back": {
+    "en": "Go back",
+    "id": "Kembali",
+    "ja": "戻る"
+  },
+  "inst-sit": {
+    "en": "Shibaura Institute of Technology",
+    "id": "Shibaura Institute of Technology",
+    "ja": "芝浦工業大学"
+  },
+  "inst-binus": {
+    "en": "BINUS University",
+    "id": "BINUS University",
+    "ja": "ビヌス大学"
+  },
+  "skill-data": {
+    "en": "Data Analytics",
+    "id": "Analisis Data",
+    "ja": "データ分析"
   }
 } as const satisfies Record<string, Record<Locale, string>>;
 

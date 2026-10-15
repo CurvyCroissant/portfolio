@@ -22,10 +22,13 @@ Language links preserve the current project. Each page includes localized titles
 - Appearance follows the system until a manual light/dark choice is saved. Storage failures do not prevent the site from working. The browser theme color follows the selected appearance.
 - The language picker uses native `<details>`. The terminal and image viewer use native modal `<dialog>` elements with background focus isolation and focus restoration. Both dismiss with Escape or a background click; the terminal also has a close button. Focus uses subtle surface changes without outlines.
 - The image viewer shows only the media over a dimmed backdrop. It supports wheel/pinch zoom, drag-to-pan, double-click zoom/reset, and keyboard `+`, `-`, and `0`. Certificates with stored rotation are fitted to the full viewport. Opening and closing animate to/from the source over 400 ms; page reveals use 900 ms and surface transitions use 600 ms.
-- Portraits, certificates, screenshots, and charts have matching animated skeletons in thumbnails and the viewer. The skills enhancement uses pill-shaped skeletons while downloading. Reserved dimensions prevent layout shifts; skeletons stop on success/failure and honor reduced motion. Static text needs no loading placeholder.
-- Refresh and project-return scroll positions restore before the page becomes visible.
+- Every thumbnail and image viewer uses the same small animated image skeleton. The skills enhancement uses pill-shaped skeletons while downloading. Reserved dimensions prevent layout shifts; skeletons stop on success/failure and honor reduced motion. Static text needs no loading placeholder.
+- Same-site links update the URL and show a home/project skeleton immediately, then swap in the returned static HTML without waiting for images. Modified/external links retain browser behavior. Failed requests offer retry/back, and changed asset versions fall back to a full navigation.
+- Scroll positions are saved per page and per history entry, including a content anchor for layout changes. Back, Forward, refresh, Home, and revisiting a page restore the saved location before content becomes visible. Storage failure falls back to memory for same-tab navigation.
+- Each mounted page owns its listeners, observers, animations, and physics. Navigation disposes them before mounting the next page.
+- Skills shuffle on each page initialization. Dragging prevents native text selection, including on WebKit. Dark mode uses diffuse ambient elevation shadows without outline rings.
 - Open the terminal with its button or `/`. Commands: `help`, `about`, `education`, `experience`, `achievements`, `skills`, `projects`, `contact`, `clear`, and `exit`. Input is always handled as plain text.
-- Email is a normal `mailto:` link, with a separate copy button and localized status feedback.
+- The entire footer email row copies the address to the clipboard and announces localized feedback. It has a mail icon and no separate copy icon or mailto action. Repository links reuse the footer’s GitHub icon.
 - Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes neighbouring pills; small physics steps and a bounded spring prevent cursor jumps from tunnelling through them. The animation loop stops when pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Pills capture touch drags; the surrounding space retains vertical page scrolling.
 - Reduced motion disables decorative reveals, transitions, and physics. Content is never hidden while waiting for animation code.
 
@@ -72,7 +75,7 @@ npm run test:ui
 
 ## Validation and deployment
 
-Browser checks cover every page and language at 320, 375, 390, 414, 768, 820, 1024, 1280, and 1440 pixels. They also cover gallery reachability, header overlap, no-JavaScript and failed-script behavior, blocked storage, dialog focus, rotated images, repeated copying, reduced motion, idle physics, image loading, and light/dark WCAG accessibility checks.
+Browser checks cover every page and language at 320, 375, 390, 414, 768, 820, 1024, 1280, and 1440 pixels. They also cover gallery reachability, header overlap, no-JavaScript and failed-script behavior, blocked storage, dialog focus, rotated images, repeated copying, reduced motion, idle physics, image loading, and light/dark WCAG accessibility checks. Navigation regressions cover per-entry scroll memory, pending requests, Back/Forward, retries, and repeated visits without retained handlers. Translation checks validate all 143 keys and interpolation variables.
 
 Pull requests run checks, a production build, and Chromium tests. Pushing to `main` runs the same checks before deploying the static output to GitHub Pages. A failed check prevents deployment. The build includes a sitemap, social preview metadata, favicon, Apple touch icon, and a custom 404 page.
 

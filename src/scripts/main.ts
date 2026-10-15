@@ -1,9 +1,11 @@
 import type { ClientCopy } from '../lib/i18n';
 import { setupLightbox } from './lightbox';
 import { readStorage, updateScrollLock, writeStorage } from './preferences';
+import { PageScope } from './lifecycle';
+import { setupNavigation } from './navigation';
 import { motionDuration, motionEase, reducedMotion } from './motion';
 
-function setupTheme(copy: ClientCopy) {
+function setupTheme(copy: ClientCopy, scope: PageScope) {
   const button = document.querySelector<HTMLButtonElement>('#theme-toggle');
   const label = document.querySelector('#theme-label');
   if (!button || !label) return;
@@ -15,23 +17,23 @@ function setupTheme(copy: ClientCopy) {
     button.setAttribute('aria-label', copy[dark ? 'theme-to-light' : 'theme-to-dark']);
   };
   apply(document.documentElement.dataset.theme === 'dark');
-  button.addEventListener('click', () => {
+  scope.on(button, 'click', () => {
     const dark = document.documentElement.dataset.theme !== 'dark';
     writeStorage('localStorage', 'theme', dark ? 'dark' : 'light');
     apply(dark);
   });
-  system.addEventListener('change', () => {
+  scope.on(system, 'change', () => {
     const saved = readStorage('localStorage', 'theme');
     if (saved !== 'light' && saved !== 'dark') apply(system.matches);
   });
   button.hidden = false;
 }
 
-function setupLanguages() {
+function setupLanguages(scope: PageScope) {
   const details = document.querySelector<HTMLDetailsElement>('#lang-dropdown');
   if (!details) return;
-  document.addEventListener('click', event => { if (!details.contains(event.target as Node)) details.open = false; });
-  document.addEventListener('keydown', event => {
+  scope.on(document, 'click', event => { if (!details.contains(event.target as Node)) details.open = false; });
+  scope.on(document, 'keydown', event => {
     if (event.key === 'Escape' && details.open) {
       details.open = false;
       details.querySelector<HTMLElement>('summary')?.focus();
@@ -39,7 +41,7 @@ function setupLanguages() {
   });
 }
 
-function setupTerminal(copy: ClientCopy) {
+function setupTerminal(copy: ClientCopy, scope: PageScope) {
   const dialog = document.querySelector<HTMLDialogElement>('#terminal-dialog');
   const input = document.querySelector<HTMLInputElement>('#term-input');
   const form = document.querySelector<HTMLFormElement>('#terminal-form');
@@ -49,6 +51,7 @@ function setupTerminal(copy: ClientCopy) {
   if (!dialog || !input || !form || !history || !trigger || typeof dialog.showModal !== 'function') return;
   let opener: HTMLElement | null = null;
   let animation: Animation | undefined, closing = false;
+  scope.add(() => { animation?.cancel(); if (dialog.open) dialog.close(); updateScrollLock(); });
   const open = () => {
     if (document.querySelector('dialog[open]')) return;
     opener = document.activeElement instanceof HTMLElement ? document.activeElement : trigger;
@@ -70,16 +73,16 @@ function setupTerminal(copy: ClientCopy) {
     }
     if (dialog.open) dialog.close();
   };
-  trigger.addEventListener('click', open);
+  scope.on(trigger, 'click', open);
   trigger.hidden = false;
-  document.querySelector('#terminal-close')?.addEventListener('click', () => { void close(); });
-  dialog.addEventListener('cancel', event => { event.preventDefault(); void close(); });
-  dialog.addEventListener('click', event => {
+  scope.on(document.querySelector('#terminal-close'), 'click', () => { void close(); });
+  scope.on(dialog, 'cancel', event => { event.preventDefault(); void close(); });
+  scope.on(dialog, 'click', event => {
     if (event.target !== dialog) return;
     const bounds = dialog.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) void close();
   });
-  dialog.addEventListener('close', () => {
+  scope.on(dialog, 'close', () => {
     animation?.cancel(); animation = undefined;
     closing = false;
     delete dialog.dataset.closing;
@@ -87,11 +90,11 @@ function setupTerminal(copy: ClientCopy) {
     updateScrollLock();
     opener?.focus({ preventScroll: true });
   });
-  reducedMotion.addEventListener('change', () => { if (reducedMotion.matches) animation?.finish(); });
-  document.querySelector('.terminal-body')?.addEventListener('click', event => {
+  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });
+  scope.on(document.querySelector('.terminal-body'), 'click', event => {
     if (!(event.target as HTMLElement).closest('a, button') && !getSelection()?.toString()) input.focus({ preventScroll: true });
   });
-  document.addEventListener('keydown', event => {
+  scope.on(document, 'keydown', event => {
     const target = event.target as HTMLElement;
     if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !target.isContentEditable && !['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) {
       event.preventDefault(); open();
@@ -105,7 +108,7 @@ function setupTerminal(copy: ClientCopy) {
     // Bound retained history without interpreting any command as HTML.
     while (history.childElementCount > 200) history.firstElementChild?.remove();
   };
-  form.addEventListener('submit', event => {
+  scope.on(form, 'submit', event => {
     event.preventDefault();
     const raw = input.value.trim();
     if (!raw) return;
@@ -146,14 +149,15 @@ async function fallbackCopy(value: string): Promise<boolean> {
   return success;
 }
 
-function setupCopy(copy: ClientCopy) {
+function setupCopy(copy: ClientCopy, scope: PageScope) {
   const button = document.querySelector<HTMLButtonElement>('#copy-email');
   const status = document.querySelector('#copy-status');
   const email = button?.dataset.email;
   if (!button || !status || !email) return;
   let busy = false;
   let timer: ReturnType<typeof setTimeout>;
-  button.addEventListener('click', async () => {
+  scope.add(() => clearTimeout(timer));
+  scope.on(button, 'click', async () => {
     if (busy) return;
     busy = true;
     let success = false;
@@ -161,6 +165,7 @@ function setupCopy(copy: ClientCopy) {
       if (navigator.clipboard && isSecureContext) { await navigator.clipboard.writeText(email); success = true; }
     } catch { /* Try the selection-based fallback below. */ }
     if (!success) success = await fallbackCopy(email);
+    if (scope.signal.aborted) return;
     clearTimeout(timer);
     status.textContent = copy[success ? 'copied' : 'copy-error'];
     timer = setTimeout(() => { status.textContent = ''; }, 3000);
@@ -169,14 +174,7 @@ function setupCopy(copy: ClientCopy) {
   button.hidden = false;
 }
 
-function setupScrollRestoration() {
-  const key = `portfolio-scroll:${document.documentElement.lang}`;
-  const top = Number(document.documentElement.dataset.restoreScroll);
-  if (Number.isFinite(top) && top > 0 && !location.hash) scrollTo({ top, behavior: 'instant' });
-  document.querySelectorAll('.project-card').forEach(card => card.addEventListener('click', () => writeStorage('sessionStorage', key, String(scrollY))));
-}
-
-function setupReveals() {
+function setupReveals(scope: PageScope) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const animations = new Set<Animation>();
   const observer = new IntersectionObserver(entries => {
@@ -190,6 +188,7 @@ function setupReveals() {
       animation.finished.then(() => animations.delete(animation)).catch(() => animations.delete(animation));
     }
   }, { threshold: 0.05 });
+  scope.add(() => { observer.disconnect(); animations.forEach(animation => animation.cancel()); });
   document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(element => {
     const bounds = element.getBoundingClientRect();
     // Already-visible content stays visible during startup and scroll restoration.
@@ -197,53 +196,57 @@ function setupReveals() {
     element.dataset.revealPending = '';
     observer.observe(element);
   });
-  reduced.addEventListener('change', () => {
+  scope.on(reduced, 'change', () => {
     if (!reduced.matches) return;
     animations.forEach(animation => animation.cancel());
     document.querySelectorAll('[data-reveal-pending]').forEach(element => element.removeAttribute('data-reveal-pending'));
   });
 }
 
-function setupSkills() {
+function setupSkills(scope: PageScope) {
   const container = document.querySelector<HTMLElement>('#skills-container');
   if (!container) return;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let dispose: (() => void) | undefined;
   let loading = false;
   const start = async () => {
-    if (reduced.matches || dispose || loading) return;
+    if (scope.signal.aborted || reduced.matches || dispose || loading) return;
     loading = true;
     container.setAttribute('aria-busy', 'true');
     try {
       const { setupPhysics } = await import('./skills-physics');
-      if (!reduced.matches) {
+      if (!scope.signal.aborted && !reduced.matches) {
         const cleanup = await setupPhysics(container);
-        if (reduced.matches) cleanup(); else dispose = cleanup;
+        if (scope.signal.aborted || reduced.matches) cleanup(); else dispose = cleanup;
       }
     } catch { /* The static list remains fully usable if the enhancement fails. */ }
     finally { loading = false; container.setAttribute('aria-busy', 'false'); }
   };
   const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) void start(); }, { rootMargin: '200px' });
   observer.observe(container);
-  reduced.addEventListener('change', () => {
+  scope.add(() => { observer.disconnect(); dispose?.(); });
+  scope.on(reduced, 'change', () => {
     if (reduced.matches) { dispose?.(); dispose = undefined; }
     else { const bounds = container.getBoundingClientRect(); if (bounds.top < innerHeight + 200 && bounds.bottom > -200) void start(); }
   });
 }
 
-function initialize() {
+function initialize(): () => void {
+  const scope = new PageScope();
+  window.portfolioScroll.enhance();
+  window.portfolioScroll.restoreInitial();
   const payload = document.querySelector('#site-copy')?.textContent;
-  if (!payload) return;
+  if (!payload) return scope.dispose;
   const copy: ClientCopy = JSON.parse(payload);
-  setupTheme(copy);
-  setupLanguages();
-  setupTerminal(copy);
-  setupCopy(copy);
-  setupLightbox(copy);
-  setupScrollRestoration();
-  setupReveals();
-  setupSkills();
+  setupTheme(copy, scope);
+  setupLanguages(scope);
+  setupTerminal(copy, scope);
+  setupCopy(copy, scope);
+  setupLightbox(copy, scope);
+  setupReveals(scope);
+  setupSkills(scope);
   requestAnimationFrame(() => document.documentElement.classList.add('motion-ready'));
+  return scope.dispose;
 }
-if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initialize, { once: true });
-else initialize();
+if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => setupNavigation(initialize), { once: true });
+else setupNavigation(initialize);
