@@ -1,0 +1,5 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { routePath, t } from '../lib/i18n';
+---
+<Layout locale="en" title={t('en', 'not-found-title')} page="404" noindex><main id="main-content" class="section not-found"><h1>{t('en', 'not-found-title')}</h1><p>{t('en', 'not-found-desc')}</p><a class="repo-link" href={routePath('en')}>{t('en', 'back-short')}</a></main></Layout>

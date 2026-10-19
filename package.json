@@ -7,11 +7,24 @@
   },
   "scripts": {
     "dev": "astro dev",
+    "check": "astro check",
+    "prebuild": "node scripts/generate-assets.mjs",
     "build": "astro build",
-    "preview": "astro preview",
+    "preview": "node scripts/serve-dist.mjs",
+    "test:ui": "playwright test",
     "astro": "astro"
   },
   "dependencies": {
-    "astro": "^7.2.9"
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.8",
+    "matter-js": "^0.20.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@axe-core/playwright": "^4.13.0",
+    "@playwright/test": "^1.64.1",
+    "@types/matter-js": "^0.20.2",
+    "sharp": "^0.35.5",
+    "typescript": "^6.0.3"
   }
 }

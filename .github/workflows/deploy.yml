@@ -7,8 +7,6 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
   group: "pages"
@@ -19,15 +17,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
-          node-version: 22
+          node-version: 24
+          cache: npm
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
+
+      - name: Check Astro and TypeScript
+        run: npm run check
 
       - name: Build Astro site
         run: npm run build
@@ -35,12 +37,29 @@ jobs:
       - name: Disable GitHub Pages Jekyll processing
         run: touch dist/.nojekyll
 
+      - name: Install browser for regression checks
+        run: npx playwright install --with-deps chromium
+
+      - name: Check layouts, languages, and interactions
+        run: npm run test:ui
+
+      - name: Upload failed browser checks
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: browser-checks
+          path: test-results/
+          retention-days: 7
+
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v5
         with:
           path: dist/
 
   deploy:
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
@@ -49,4 +68,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

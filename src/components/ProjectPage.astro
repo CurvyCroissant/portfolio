@@ -1,0 +1,21 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Icon from './Icon.astro';
+import ImageCard from './ImageCard.astro';
+import type { Project } from '../data/projects';
+import { t, type Locale } from '../lib/i18n';
+interface Props { locale: Locale; project: Project }
+const { locale, project } = Astro.props;
+---
+<Layout locale={locale} page={`projects/${project.slug}`} title={`${t(locale, project.titleKey)} | ${t(locale, 'my-name')}`} description={t(locale, project.descriptionKey)}>
+  <main id="main-content" class="section project-detail">
+    <h1 class="project-title">{t(locale, project.titleKey)}</h1>
+    <dl class="project-meta"><div><dt>{t(locale, 'ctx-label')}</dt><dd>{project.contextKey ? t(locale, project.contextKey) : project.context}</dd></div><div><dt>{t(locale, 'ts-label')}</dt><dd>{project.technologies.join(', ')}</dd></div></dl>
+    <div class="project-content-grid">
+      <section class="content-block" aria-labelledby="problem-title" data-reveal><h2 id="problem-title">{t(locale, 'prob-label')}</h2><p>{t(locale, project.problemKey)}</p></section>
+      <section class="content-block" aria-labelledby="solution-title" data-reveal><h2 id="solution-title">{t(locale, 'sol-label')}</h2><p>{t(locale, project.solutionKey)}</p></section>
+    </div>
+    <section class="content-block impact-block" aria-labelledby="impact-title" data-reveal><h2 id="impact-title">{t(locale, 'imp-label')}</h2><p>{t(locale, project.impactKey)}</p>{project.repository && <a href={project.repository} target="_blank" rel="noopener noreferrer" class="repo-link"><Icon name="github" />{t(locale, 'view-repo')}</a>}</section>
+    <section aria-labelledby="gallery-title"><h2 class="gallery-title" id="gallery-title">{t(locale, 'gal-label')}</h2><div class="cert-grid">{project.gallery.map(image => <ImageCard locale={locale} image={image.image} caption={t(locale, image.captionKey)} position={image.position} />)}</div></section>
+  </main>
+</Layout>

@@ -1,0 +1,20 @@
+---
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { t, type Locale } from '../lib/i18n';
+interface Props { locale: Locale }
+const { locale } = Astro.props;
+---
+<footer class="main-footer" aria-label={t(locale, 'contact-title')}>
+  <div class="footer-content">
+    <div class="social-links">
+      <div class="email-item">
+        <div class="email-row"><button class="social-link email-button" id="copy-email" type="button" data-email={site.email} aria-label={t(locale, 'copy-email')}><Icon name="mail" /><span>{site.email}</span></button></div>
+        <p class="copy-status" id="copy-status" role="status"></p>
+      </div>
+      <a class="social-link" href={site.github} target="_blank" rel="noopener noreferrer"><Icon name="github" /><span>github.com/CurvyCroissant</span></a>
+      <a class="social-link" href={site.linkedin} target="_blank" rel="noopener noreferrer"><Icon name="linkedin" /><span>linkedin.com/in/aaron-nathanael</span></a>
+    </div>
+    <p class="footer-text">© {new Date().getUTCFullYear()} {t(locale, 'my-name')}</p>
+  </div>
+</footer>
