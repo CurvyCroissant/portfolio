@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
+import Environment from '../components/Environment.astro';
 import bootstrap from '../scripts/bootstrap.js?raw';
 import { site } from '../data/site';
 import { absoluteUrl, clientCopy, languageNames, locales, routePath, t, type Locale } from '../lib/i18n';
@@ -44,6 +45,7 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
     <script is:inline set:html={bootstrap} />
   </head>
   <body>
+    <Environment />
     <a class="skip-link" href="#main-content">{t(locale, 'skip-content')}</a>
     <header class="site-header">
       {page && <a href={routePath(locale)} class="back-link control" aria-label={t(locale, 'back-home')}><Icon name="back" size={18} /><span class="back-full">{t(locale, 'back-home').replace(/^←\s*/, '')}</span><span class="back-short">{t(locale, 'back-short')}</span></a>}
@@ -55,6 +57,7 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
           </nav>
         </details>
         <button id="theme-toggle" class="control" type="button" aria-label={t(locale, 'appearance-label')} hidden><span class="toggle-text" id="theme-label" data-measure={t(locale, 'nav-theme-light')}>{t(locale, 'nav-theme-dark')}</span><span class="theme-moon"><Icon name="moon" /></span><span class="theme-sun"><Icon name="sun" /></span></button>
+        <button id="motion-toggle" class="control" type="button" aria-label={t(locale, 'motion-enable')} aria-pressed="false" hidden><span class="toggle-text" id="motion-label">{t(locale, 'nav-motion')}</span><Icon name="motion" /></button>
       </div>
     </header>
     <slot />

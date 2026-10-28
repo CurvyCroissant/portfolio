@@ -5,24 +5,25 @@
 @property --text { syntax: '<color>'; inherits: true; initial-value: #242424; }
 @property --secondary { syntax: '<color>'; inherits: true; initial-value: #555555; }
 @property --visited { syntax: '<color>'; inherits: true; initial-value: #5b5b5b; }
-@property --surface { syntax: '<color>'; inherits: true; initial-value: rgb(250 250 250 / 76%); }
+@property --surface { syntax: '<color>'; inherits: true; initial-value: rgb(250 250 250 / 52%); }
 @property --surface-solid { syntax: '<color>'; inherits: true; initial-value: #f7f7f7; }
-@property --glass { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 58%); }
+@property --glass { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 48%); }
 @property --glass-solid { syntax: '<color>'; inherits: true; initial-value: #f2f2f2; }
-@property --glass-panel { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 30%); }
+@property --glass-panel { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 20%); }
 @property --hover { syntax: '<color>'; inherits: true; initial-value: #dedede; }
 @property --accent { syntax: '<color>'; inherits: true; initial-value: #333333; }
 @property --accent-soft { syntax: '<color>'; inherits: true; initial-value: #e1e1e1; }
 @property --border { syntax: '<color>'; inherits: true; initial-value: rgb(80 80 80 / 17%); }
-@property --glint { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 86%); }
-@property --sheen { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 64%); }
-@property --ambient-a { syntax: '<color>'; inherits: true; initial-value: #d6d6d6; }
-@property --ambient-b { syntax: '<color>'; inherits: true; initial-value: #e1e1e1; }
-@property --ambient-c { syntax: '<color>'; inherits: true; initial-value: #dedede; }
-@property --page-light { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 62%); }
+@property --glint { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 95%); }
+@property --sheen { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 82%); }
+@property --ambient-a { syntax: '<color>'; inherits: true; initial-value: #cdcdcd; }
+@property --ambient-b { syntax: '<color>'; inherits: true; initial-value: #fafafa; }
+@property --ambient-c { syntax: '<color>'; inherits: true; initial-value: #d4d4d4; }
+@property --page-light { syntax: '<color>'; inherits: true; initial-value: rgb(255 255 255 / 90%); }
 @property --shadow-tone { syntax: '<color>'; inherits: true; initial-value: rgb(0 0 0 / 12%); }
 @property --shadow-deep { syntax: '<color>'; inherits: true; initial-value: rgb(0 0 0 / 5%); }
 @property --rim-bottom { syntax: '<color>'; inherits: true; initial-value: rgb(0 0 0 / 8%); }
+@property --local-light { syntax: '<color>'; inherits: false; initial-value: transparent; }
 @property --page-x { syntax: '<percentage>'; inherits: true; initial-value: 50%; }
 @property --page-y { syntax: '<percentage>'; inherits: true; initial-value: 40%; }
 :root {
@@ -31,21 +32,21 @@
   --text: #242424;
   --secondary: #555555;
   --visited: #5b5b5b;
-  --surface: rgb(250 250 250 / 76%);
+  --surface: rgb(250 250 250 / 52%);
   --surface-solid: #f7f7f7;
-  --glass: rgb(255 255 255 / 58%);
+  --glass: rgb(255 255 255 / 48%);
   --glass-solid: #f2f2f2;
-  --glass-panel: rgb(255 255 255 / 30%);
+  --glass-panel: rgb(255 255 255 / 20%);
   --hover: #dedede;
   --accent: #333333;
   --accent-soft: #e1e1e1;
   --border: rgb(80 80 80 / 17%);
-  --glint: rgb(255 255 255 / 86%);
-  --sheen: rgb(255 255 255 / 64%);
-  --ambient-a: #d6d6d6;
-  --ambient-b: #e1e1e1;
-  --ambient-c: #dedede;
-  --page-light: rgb(255 255 255 / 62%);
+  --glint: rgb(255 255 255 / 95%);
+  --sheen: rgb(255 255 255 / 82%);
+  --ambient-a: #cdcdcd;
+  --ambient-b: #fafafa;
+  --ambient-c: #d4d4d4;
+  --page-light: rgb(255 255 255 / 90%);
   --shadow-tone: rgb(0 0 0 / 12%);
   --shadow-deep: rgb(0 0 0 / 5%);
   --rim-bottom: rgb(0 0 0 / 8%);
@@ -69,23 +70,23 @@
   color-scheme: dark;
   --bg: #292929;
   --text: #f1f1f1;
-  --secondary: #c7c7c7;
-  --visited: #d4d4d4;
-  --surface: rgb(55 55 55 / 78%);
+  --secondary: #e6e6e6;
+  --visited: #e6e6e6;
+  --surface: rgb(60 60 60 / 48%);
   --surface-solid: #383838;
-  --glass: rgb(72 72 72 / 54%);
+  --glass: rgb(88 88 88 / 44%);
   --glass-solid: #454545;
-  --glass-panel: rgb(77 77 77 / 25%);
+  --glass-panel: rgb(80 80 80 / 20%);
   --hover: #555555;
   --accent: #eeeeee;
   --accent-soft: #4c4c4c;
   --border: rgb(255 255 255 / 14%);
-  --glint: rgb(255 255 255 / 24%);
-  --sheen: rgb(255 255 255 / 16%);
-  --ambient-a: #393939;
-  --ambient-b: #303030;
-  --ambient-c: #353535;
-  --page-light: rgb(255 255 255 / 11%);
+  --glint: rgb(255 255 255 / 48%);
+  --sheen: rgb(255 255 255 / 10%);
+  --ambient-a: #4a4a4a;
+  --ambient-b: #202020;
+  --ambient-c: #3c3c3c;
+  --page-light: rgb(255 255 255 / 20%);
   --shadow-tone: rgb(0 0 0 / 34%);
   --shadow-deep: rgb(0 0 0 / 18%);
   --rim-bottom: rgb(0 0 0 / 18%);
@@ -95,23 +96,23 @@
     color-scheme: dark;
     --bg: #292929;
     --text: #f1f1f1;
-    --secondary: #c7c7c7;
-    --visited: #d4d4d4;
-    --surface: rgb(55 55 55 / 78%);
+    --secondary: #e6e6e6;
+    --visited: #e6e6e6;
+    --surface: rgb(60 60 60 / 48%);
     --surface-solid: #383838;
-    --glass: rgb(72 72 72 / 54%);
+    --glass: rgb(88 88 88 / 44%);
     --glass-solid: #454545;
-    --glass-panel: rgb(77 77 77 / 25%);
+    --glass-panel: rgb(80 80 80 / 20%);
     --hover: #555555;
     --accent: #eeeeee;
     --accent-soft: #4c4c4c;
     --border: rgb(255 255 255 / 14%);
-    --glint: rgb(255 255 255 / 24%);
-    --sheen: rgb(255 255 255 / 16%);
-    --ambient-a: #393939;
-    --ambient-b: #303030;
-    --ambient-c: #353535;
-    --page-light: rgb(255 255 255 / 11%);
+    --glint: rgb(255 255 255 / 48%);
+    --sheen: rgb(255 255 255 / 10%);
+    --ambient-a: #4a4a4a;
+    --ambient-b: #202020;
+    --ambient-c: #3c3c3c;
+    --page-light: rgb(255 255 255 / 20%);
     --shadow-tone: rgb(0 0 0 / 34%);
     --shadow-deep: rgb(0 0 0 / 18%);
     --rim-bottom: rgb(0 0 0 / 18%);
@@ -124,11 +125,13 @@ html.dialog-open body { padding-inline-end: var(--scrollbar-width, 0px); }
 html.dialog-open .site-header { inset-inline-end: var(--scrollbar-width, 0px); }
 html.restoring-scroll body { visibility: hidden; }
 body { overscroll-behavior-y: none; margin: 0; isolation: isolate; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif; line-height: 1.65; -webkit-font-smoothing: antialiased; overflow-wrap: break-word; }
-/* The environment and cursor light share the monochrome palette. */
-body::before, body::after { content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none; }
-body::before { background: radial-gradient(ellipse at 8% 8%, var(--ambient-a), transparent 48%), radial-gradient(ellipse at 96% 36%, var(--ambient-b), transparent 48%), radial-gradient(ellipse at 28% 96%, var(--ambient-c), transparent 48%); }
-body::after { background: radial-gradient(circle 440px at var(--page-x) var(--page-y), var(--page-light), transparent 75%); opacity: 0; transition: opacity var(--motion-ui) var(--ease), --page-x 240ms var(--ease), --page-y 240ms var(--ease); }
-body[data-cursor-active]::after { opacity: 1; }
+/* Explicit compositor layers: no page lighting is buried behind body paint. */
+.page-environment { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; contain: strict; }
+.ambient-field, .cursor-light { position: absolute; inset: 0; pointer-events: none; }
+.ambient-field { background: radial-gradient(ellipse at 5% 4%, var(--ambient-a), transparent 62%), radial-gradient(ellipse at 96% 32%, var(--ambient-b), transparent 58%), radial-gradient(ellipse at 24% 96%, var(--ambient-c), transparent 64%); }
+.cursor-light { background: radial-gradient(circle 340px at var(--page-x) var(--page-y), var(--page-light), transparent 78%); opacity: 0; transition: opacity var(--motion-ui) var(--ease), --page-x 180ms var(--ease), --page-y 180ms var(--ease); }
+body[data-cursor-active] .cursor-light { opacity: 1; }
+:where(body > main, body > .main-footer) { position: relative; z-index: 1; }
 :lang(ja) { line-break: strict; }
 button, input, summary { font: inherit; }
 button, a, summary { -webkit-tap-highlight-color: transparent; }
@@ -145,10 +148,10 @@ h1, h2, h3, p { margin: 0; }
 
 /* One motion vocabulary; geometry, light and press states all interpolate. */
 :where(body, .list-item, .cert-card, .project-card, .skills-container, .skill-pill, .main-footer, .project-meta, .content-block, p, h1, h2, h3, dt, dd, a, button, summary, .lang-menu) {
-  transition-property: background-color, color, box-shadow, opacity, transform, translate, scale, filter, border-radius, --glass-x, --glass-y;
-  transition-duration: var(--motion-color), var(--motion-color), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--motion-menu), 240ms, 240ms;
+  transition-property: background-color, color, box-shadow, opacity, transform, translate, scale, filter, border-radius, --glass-x, --glass-y, --local-light;
+  transition-duration: var(--motion-color), var(--motion-color), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--motion-ui), var(--press-duration, var(--motion-ui)), var(--motion-ui), var(--motion-menu), 180ms, 180ms, var(--motion-ui);
   transition-timing-function: var(--ease), var(--ease), var(--ease), var(--ease), var(--ease), var(--ease), var(--ease-spring), var(--ease), var(--ease), var(--ease), var(--ease);
-  transition-delay: 0ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms, 0ms;
+  transition-delay: 0ms;
 }
 :where(a, button, summary):focus-visible { outline: none; background-color: var(--hover); color: var(--text); text-decoration: none; }
 :where(.control, .repo-link, .proof-link, .social-link):focus-visible { box-shadow: var(--glass-shadow); }
@@ -161,7 +164,6 @@ a[data-clicked] { color: var(--visited); }
 .control, .icon-button, .repo-link, .proof-link, .social-link {
   position: relative; isolation: isolate; display: inline-flex; align-items: center; justify-content: center; gap: 9px; min-width: 48px; min-height: 48px; padding: 13px 21px; border: 0; border-radius: 999px; background: var(--glass); color: var(--text); font-size: 14px; font-weight: 600; line-height: 1.45; text-decoration: none; box-shadow: var(--glass-shadow); -webkit-backdrop-filter: blur(26px) saturate(1.55); backdrop-filter: blur(26px) saturate(1.55);
 }
-:where(.control, .repo-link, .proof-link, .social-link, .lang-menu, .list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta, .main-footer)::before { content: ""; position: absolute; inset: 0; z-index: -1; border-radius: inherit; pointer-events: none; background: radial-gradient(ellipse at var(--glass-x, 24%) var(--glass-y, 0%), var(--sheen), transparent 65%), linear-gradient(155deg, var(--sheen), transparent 42%); opacity: .65; transition: opacity var(--motion-ui) var(--ease); }
 .icon-button { padding: 13px; flex-shrink: 0; }
 .back-link { pointer-events: auto; flex-shrink: 0; }
 .back-short { display: none; }
@@ -211,7 +213,7 @@ a[data-clicked] { color: var(--visited); }
 .skill-pill { display: inline-flex; align-items: center; justify-content: center; padding: 10px 21px; border: 0; border-radius: 999px; background: var(--glass); color: var(--text); box-shadow: var(--pill-shadow); font-size: 14px; line-height: 1.5; white-space: nowrap; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; transition-property: background-color, color, box-shadow; }
 .skills-container.physics-active { display: block; padding: 0; overflow: hidden; }
 .physics-active .skill-pill { position: absolute; top: 0; left: 0; margin: 0; cursor: grab; touch-action: none; transition-property: background-color, color, box-shadow; }
-.physics-active .skill-pill[data-dragging] { cursor: grabbing; z-index: 1; background: var(--hover); box-shadow: var(--glass-shadow); }
+.physics-active .skill-pill[data-dragging] { cursor: grabbing; z-index: 1; background-color: var(--hover); box-shadow: var(--glass-shadow); }
 
 .main-footer { max-width: 1140px; margin: 40px auto 24px; padding: 44px 28px 24px; }
 .footer-content { max-width: 1100px; margin: 0 auto; }
@@ -267,13 +269,12 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
 .translation-text { display: inline-block; vertical-align: baseline; max-width: 100%; }
 
 @media (hover: hover) and (pointer: fine) {
-  :where(.control, .icon-button, .repo-link, .proof-link, .social-link):hover { background-color: var(--hover); translate: 0 -2px; scale: 1.025; box-shadow: var(--glass-shadow), var(--shadow); }
-  :where(.control, .repo-link, .proof-link, .social-link):hover::before { opacity: 1; }
+  :where(.control, .icon-button, .repo-link, .proof-link, .social-link):hover { background-color: var(--hover); translate: 0 -2px; scale: 1.035; box-shadow: var(--glass-shadow), var(--shadow); }
   .lang-option:hover { background-color: var(--hover); }
   :where(.portrait-link, .cert-card, .project-card):hover { translate: 0 -6px; scale: 1.012; box-shadow: var(--shadow); }
   .physics-active .skill-pill:hover { background-color: var(--hover); box-shadow: var(--glass-shadow); }
 }
-:where(.control, .repo-link, .proof-link, .social-link, .project-card, .cert-card)[data-glass-pressed] { scale: .97; background-color: var(--hover); }
+:where(.control, .repo-link, .proof-link, .social-link, .project-card, .cert-card)[data-glass-pressed] { --press-duration: 180ms; scale: .965; background-color: var(--hover); }
 /* Focus changes the material and label, never adds a selection ring. */
 :where(a, button, summary):focus-visible { outline: none; background-color: var(--hover); color: var(--text); text-decoration: none; }
 :where(.control, .repo-link, .proof-link, .social-link):focus-visible { box-shadow: var(--glass-shadow), var(--shadow); }
@@ -303,6 +304,11 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
   .skill-pill { font-size: 12px; padding: 9px 16px; }
   .social-link { border-radius: 28px; }
 }
+@media (max-width: 360px) {
+  .site-header { gap: 6px; padding-inline-start: max(12px, env(safe-area-inset-left)); padding-inline-end: max(12px, env(safe-area-inset-right)); }
+  .site-header #lang-toggle .locale-code { display: none; }
+  .site-header #lang-toggle { width: 48px; }
+}
 @media (max-width: 490px) { .skills-container { min-height: 420px; } }
 /* The platform can change accessibility preferences while a page is open. */
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
@@ -311,10 +317,10 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
   :root :where(.control, .icon-button, .repo-link, .proof-link, .social-link, .lang-menu, .skill-pill) { background-color: var(--glass-solid); -webkit-backdrop-filter: none; backdrop-filter: none; }
   :root :where(.list-item, .project-card, .cert-card, .skills-container, .project-meta, .content-block) { background-color: var(--surface-solid); }
-  body::before, body::after { background-image: none; }
+  .ambient-field { background-image: none; }
 }
 @media (prefers-reduced-motion: reduce) {
-  *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  :root:not([data-motion-override="full"]), :root:not([data-motion-override="full"]) *, :root:not([data-motion-override="full"]) *::before, :root:not([data-motion-override="full"]) *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 }
 /* Native snapshots keep fixed glass navigation stable across page changes. */
 ::view-transition-old(root), ::view-transition-new(root) { animation-duration: var(--motion-page); animation-timing-function: var(--ease); animation-fill-mode: both; mix-blend-mode: normal; }
@@ -324,11 +330,39 @@ dialog[data-closing]::backdrop { animation-name: backdrop-out; }
 @keyframes page-in { from { opacity: 0; transform: translateX(var(--page-enter, 32px)) scale(1.015); } }
 
 :where(.list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta, .main-footer) { position: relative; isolation: isolate; }
-:where(.list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta, .main-footer)::before { opacity: .12; }
-[data-glass-lit]::before { opacity: .95; }
 .skills-container { background-color: var(--glass-panel); box-shadow: var(--glass-shadow); -webkit-backdrop-filter: blur(28px); backdrop-filter: blur(28px); }
 /* Typed palette tokens own the three theme phases; descendant transitions must not lag behind them. */
 html[data-theme-changing], html[data-theme-changing] *, html[data-theme-changing] *::before, html[data-theme-changing] *::after { transition-property: opacity, translate, scale, filter, border-radius, --glass-x, --glass-y, --page-x, --page-y !important; }
 html[data-language-layout] [data-layout-held] { transition: none !important; }
 html[data-language-layout] [data-reveal-pending] { opacity: 1; transform: none; }
 @media (prefers-reduced-transparency: reduce), (prefers-contrast: more) { :root .skills-container { background-color: var(--surface-solid); -webkit-backdrop-filter: none; backdrop-filter: none; } }
+
+/* The optical material is painted in the background, never behind its own fill. */
+:is(.control, .repo-link, .proof-link, .social-link, .lang-menu, .lang-option, .list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta) {
+  background-image: radial-gradient(ellipse 85% 115% at var(--glass-x) var(--glass-y), var(--local-light), transparent 74%), linear-gradient(135deg, var(--sheen) -70%, transparent 36%, var(--rim-bottom) 170%);
+}
+[data-glass-lit] { --local-light: var(--sheen); }
+:is(.list-item, .project-card, .cert-card, .content-block, .project-meta) { box-shadow: var(--glass-shadow); }
+/* Content stays inexpensive at rest; only the material under interaction lenses. */
+:is(.list-item, .project-card, .cert-card, .content-block, .project-meta):is([data-glass-lit], :focus-within) { -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px); }
+.js :is(.proof-link, .repo-link, .social-link):not([data-glass-visible]) { -webkit-backdrop-filter: none; backdrop-filter: none; }
+.main-footer { border-radius: var(--radius-card); background-image: radial-gradient(ellipse at var(--glass-x) var(--glass-y), var(--local-light), transparent 76%); }
+/* A permanent optical edge belongs to the material; focus never adds a ring. */
+@supports (mask-composite: exclude) {
+  :is(.control, .repo-link, .proof-link, .social-link, .lang-menu, .list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta)::before {
+    content: ""; position: absolute; inset: 0; z-index: 0; padding: 1px; border-radius: inherit; pointer-events: none;
+    background: linear-gradient(145deg, var(--glint), transparent 35%, var(--sheen) 66%, var(--rim-bottom));
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0); mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude;
+  }
+}
+#motion-toggle[aria-pressed="false"] svg { opacity: .65; }
+@media (max-width: 600px) {
+  .site-header .control { padding-inline: 12px; }
+  .site-header #lang-toggle { gap: 7px; padding-inline: 10px; font-size: 13px; }
+  .site-header #theme-toggle, .site-header #motion-toggle { min-width: 48px; width: 48px; padding-inline: 10px; }
+}
+:root[data-motion="reduced"], :root[data-motion="reduced"] *, :root[data-motion="reduced"] *::before, :root[data-motion="reduced"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+@media (prefers-reduced-transparency: reduce), (prefers-contrast: more) {
+  :root :is(.control, .repo-link, .proof-link, .social-link, .lang-menu, .lang-option, .list-item, .project-card, .cert-card, .skills-container, .skill-pill, .content-block, .project-meta) { -webkit-backdrop-filter: none; backdrop-filter: none; background-image: none; }
+}

@@ -1,10 +1,16 @@
 import type { PageScope } from './lifecycle';
-import { reducedMotion } from './motion';
 
 /** Page-wide ambient light and nested material reflections, scheduled only on input. */
 export function setupGlass(scope: PageScope) {
   const actions = '.control, .repo-link, .proof-link, .social-link, .project-card, .cert-card';
   const materials = `${actions}, .lang-menu, .lang-option, .list-item, .skills-container, .skill-pill, .content-block, .project-meta, .main-footer`;
+  // Offscreen actions need no compositor layer. Navigation and the main skills
+  // material stay eager; content actions acquire blur just before entering view.
+  const deferred = document.querySelectorAll<HTMLElement>('.proof-link, .repo-link, .social-link');
+  const visibility = new IntersectionObserver(entries => {
+    entries.forEach(entry => entry.target.toggleAttribute('data-glass-visible', entry.isIntersecting));
+  }, { rootMargin: '100px' });
+  deferred.forEach(element => visibility.observe(element));
   let lit = new Set<HTMLElement>();
   let pressed: HTMLElement | null = null;
   let frame: number | undefined;
@@ -26,7 +32,7 @@ export function setupGlass(scope: PageScope) {
     pressed?.removeAttribute('data-glass-pressed'); pressed = null;
   };
   scope.on(document, 'pointermove', event => {
-    if (event.pointerType !== 'mouse' || reducedMotion.matches || !(event.target instanceof Element)) return;
+    if (event.pointerType !== 'mouse' || !(event.target instanceof Element)) return;
     pointer = { x: event.clientX, y: event.clientY, target: event.target };
     if (frame !== undefined) return;
     frame = requestAnimationFrame(() => {
@@ -61,6 +67,10 @@ export function setupGlass(scope: PageScope) {
   scope.on(document, 'pointercancel', () => { release(); clearLight(); }, { passive: true });
   scope.on(document, 'portfolio:before-navigation' as keyof DocumentEventMap, () => { release(); clearLight(); });
   scope.on(window, 'blur', () => { release(); clearLight(); });
-  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) clearLight(); });
-  scope.add(() => { release(); clearLight(); });
+
+  scope.add(() => {
+    visibility.disconnect();
+    deferred.forEach(element => element.removeAttribute('data-glass-visible'));
+    release(); clearLight();
+  });
 }

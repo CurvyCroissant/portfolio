@@ -26,9 +26,9 @@ Language links preserve the current project. Each page includes localized titles
 - Skills shuffle on each page initialization. Dragging prevents native text selection, including on WebKit. Dark mode uses diffuse ambient elevation shadows without outline rings.
 - The entire footer email row copies the address to the clipboard and announces localized feedback. It has a mail icon and no separate copy icon or mailto action. Repository links reuse the footer’s GitHub icon.
 - Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes neighbouring pills; small physics steps and a bounded spring prevent cursor jumps from tunnelling through them. The animation loop stops when pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Pills capture touch drags; the surrounding space retains vertical page scrolling.
-- Reduced motion disables decorative reveals, transitions, and physics. Content is never hidden while waiting for animation code.
+- Motion follows the system by default. The localized Motion control lets a visitor explicitly enable or reduce animations and saves that choice. CSS transitions, menus, navigation, dialogs, reveals and deferred physics share the same effective preference. Reduced motion keeps direct pointer illumination while removing spatial animation and light smoothing. Content is never hidden while waiting for animation code.
 - Native View Transitions blend the old and incoming viewports while preserving fixed navigation. Older browsers use a content-only spatial fallback. Both paths cancel safely, respect reduced motion and preserve history and scroll restoration.
-- Cursor light follows the pointer across the background and nested content materials, and touch press feedback releases smoothly. Language menus materialize from their trigger and reverse their current animation when interrupted; closed/closing panels stay inert. Selection/focus outlines are absent; keyboard focus uses material, elevation and movement without underlines or rings.
+- A dedicated page environment paints ambient light and cursor illumination above the page background. Translucent materials have optical edges and moving reflections painted directly into their backgrounds. Content blur activates during interaction; action blur activates near visibility, while navigation and the main skills material keep their glass eager. Offscreen action blur layers are released. Input schedules one frame at a time and stops at rest. Touch press feedback releases smoothly. Language menus materialize from their trigger, stay within the viewport and reverse their current animation when interrupted; closed/closing panels stay inert. Selection/focus outlines are absent; keyboard focus uses material, elevation and movement without underlines or rings.
 - Reduced transparency/increased contrast preferences and browsers without backdrop filtering receive solid, legible material fallbacks. Pointer lighting schedules work only on input and stays idle at rest.
 
 The material hierarchy follows [Apple’s Materials guidance](https://developer.apple.com/design/human-interface-guidelines/materials) and [Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/), implemented with web-native CSS and progressive enhancement.
@@ -48,12 +48,12 @@ npm run dev
 | `npm run check` | Check Astro and TypeScript |
 | `npm run build` | Generate brand PNGs and build the static site into `dist/` |
 | `npm run preview` | Serve the production build at `http://127.0.0.1:4321/portfolio/` |
-| `npm run test:ui` | Run Chromium layout, interaction, loading, and accessibility regressions |
+| `npm run test:ui` | Run Chromium regressions and Chromium/WebKit material and motion checks |
 
-Install Chromium once before running browser tests:
+Install the browser engines once before running browser tests:
 
 ```sh
-npx playwright install chromium
+npx playwright install chromium webkit
 npm run build
 npm run test:ui
 ```
@@ -76,9 +76,9 @@ npm run test:ui
 
 Browser checks cover every page and language at 320, 375, 390, 414, 768, 820, 1024, 1280, and 1440 pixels. They also cover gallery reachability, header overlap, no-JavaScript and failed-script behavior, blocked storage, dialog focus, rotated images, repeated copying, reduced motion, idle physics, image loading, and light/dark WCAG accessibility checks. Navigation regressions cover per-entry scroll memory, pending requests, Back/Forward, retries, and repeated visits without retained handlers. Translation checks validate every message key and interpolation variable.
 
-Pull requests run checks, a production build, and Chromium tests. Pushing to `main` runs the same checks before deploying the static output to GitHub Pages. A failed check prevents deployment. The build includes a sitemap, social preview metadata, favicon, Apple touch icon, and a custom 404 page.
+Pull requests run checks, a production build, and browser tests. Pushing to `main` runs the same checks before deploying the static output to GitHub Pages. A failed check prevents deployment. The build includes a sitemap, social preview metadata, favicon, Apple touch icon, and a custom 404 page.
 
-The automated suite uses Chromium. Real iOS Safari testing remains useful for virtual keyboard, touch, and browser chrome behavior. Core Web Vitals should be measured on the deployed site; the code does not claim a guaranteed CLS or performance score.
+The complete regression suite uses Chromium. Focused material and motion checks also run in WebKit: actual background pixels, moving surface reflections and text contrast under illumination in both themes, system motion preferences and explicit overrides, intermediate theme/language/menu/viewer frames and narrow touch layouts. Chromium also verifies actual backdrop blur against a striped background. Linux WPE does not paint that blur in our test environment, including a minimal independent scene, so that single pixel check is skipped in WebKit; physical Safari verification remains necessary for blur, virtual keyboard, touch and browser chrome behavior. Core Web Vitals should be measured on the deployed site; the code does not claim a guaranteed CLS or performance score.
 
 ## License
 

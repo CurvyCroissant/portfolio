@@ -8,13 +8,30 @@ export default defineConfig({
   reporter: 'list',
   use: {
     baseURL: 'http://127.0.0.1:4321/portfolio/',
-    browserName: 'chromium',
     screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
-    launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? {
-      executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
-      args: JSON.parse(process.env.PLAYWRIGHT_CHROMIUM_ARGS ?? '[]'),
-    } : {},
   },
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        launchOptions: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH ? {
+          executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH,
+          args: JSON.parse(process.env.PLAYWRIGHT_CHROMIUM_ARGS ?? '[]'),
+        } : {},
+      },
+    },
+    {
+      name: 'webkit',
+      testMatch: '**/material-motion.spec.ts',
+      use: {
+        browserName: 'webkit',
+        launchOptions: process.env.PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH ? {
+          executablePath: process.env.PLAYWRIGHT_WEBKIT_EXECUTABLE_PATH,
+        } : {},
+      },
+    },
+  ],
   webServer: { command: 'npm run preview', url: 'http://127.0.0.1:4321/portfolio/', reuseExistingServer: !process.env.CI, timeout: 30_000 },
 });

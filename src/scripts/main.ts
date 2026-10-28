@@ -1,7 +1,7 @@
 import type { ClientCopy } from '../lib/i18n';
 import { PageScope } from './lifecycle';
 import { setupNavigation } from './navigation';
-import { motionDuration, motionEase } from './motion';
+import { motionDuration, motionEase, reducedMotion } from './motion';
 import { setupGlass } from './glass';
 import { setupTheme } from './theme';
 
@@ -14,6 +14,13 @@ function setupLanguages(scope: PageScope) {
   let animation: Animation | undefined;
   let revision = 0;
   panel.inert = !details.open;
+  const position = () => {
+    const anchor = details.getBoundingClientRect();
+    const width = panel.offsetWidth, viewport = document.documentElement.clientWidth;
+    const shift = Math.max(16 - (anchor.right - width), Math.min(0, viewport - 16 - anchor.right));
+    panel.style.right = `${-shift}px`;
+    panel.style.transformOrigin = `${Math.max(16, Math.min(width - 16, anchor.left + anchor.width / 2 - (anchor.right - width + shift)))}px 0`;
+  };
   const present = (opening: boolean, restoreFocus = false) => {
     if (restoreFocus) {
       restoringFocus = true; toggle.focus({ preventScroll: true }); restoringFocus = false;
@@ -27,6 +34,7 @@ function setupLanguages(scope: PageScope) {
     animation?.cancel();
     details.dataset.menuState = opening ? 'open' : 'closing';
     details.open = true;
+    position();
     panel.inert = !opening;
     const finish = () => {
       if (ticket !== revision) return;
@@ -62,9 +70,10 @@ function setupLanguages(scope: PageScope) {
   scope.on(document, 'click', event => { if (!details.contains(event.target as Node)) close(); });
   scope.on(document, 'portfolio:before-navigation' as keyof DocumentEventMap, () => close());
   scope.on(window, 'blur', () => close());
+  scope.on(window, 'resize', () => { if (details.open) position(); }, { passive: true });
   scope.on(document, 'visibilitychange', () => { if (document.hidden) close(); });
   scope.on(document, 'keydown', event => { if (event.key === 'Escape' && details.open) { event.preventDefault(); close(true); } });
-  scope.on(matchMedia('(prefers-reduced-motion: reduce)'), 'change', event => { if (event.matches) animation?.finish(); });
+  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });
   scope.add(() => { revision++; animation?.cancel(); details.open = false; delete details.dataset.menuState; });
 }
 
@@ -129,7 +138,7 @@ function setupCopy(copy: ClientCopy, scope: PageScope) {
 }
 
 function setupReveals(scope: PageScope) {
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = reducedMotion;
   const animations = new Set<Animation>();
   const observer = new IntersectionObserver(entries => {
     for (const entry of entries) {
@@ -137,6 +146,7 @@ function setupReveals(scope: PageScope) {
       observer.unobserve(entry.target);
       if (!entry.target.hasAttribute('data-reveal-pending')) continue;
       entry.target.removeAttribute('data-reveal-pending');
+      entry.target.setAttribute('data-reveal-seen', '');
       if (reduced.matches || document.documentElement.hasAttribute('data-language-layout')) continue;
       const animation = entry.target.animate([{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('reveal'), easing: motionEase() });
       animation.id = 'portfolio-reveal';
@@ -145,15 +155,15 @@ function setupReveals(scope: PageScope) {
     }
   }, { threshold: 0.05 });
   scope.add(() => { observer.disconnect(); animations.forEach(animation => animation.cancel()); });
-  document.querySelectorAll<HTMLElement>('[data-reveal]').forEach(element => {
+  const observe = () => document.querySelectorAll<HTMLElement>('[data-reveal]:not([data-reveal-seen])').forEach(element => {
     const bounds = element.getBoundingClientRect();
-    // Already-visible content stays visible during startup and scroll restoration.
-    if (reduced.matches || (bounds.top < innerHeight && bounds.bottom > 0)) return;
-    element.dataset.revealPending = '';
-    observer.observe(element);
+    if (bounds.top < innerHeight && bounds.bottom > 0) { element.dataset.revealSeen = ''; return; }
+    if (!reduced.matches) { element.dataset.revealPending = ''; observer.observe(element); }
   });
+  observe();
   scope.on(reduced, 'change', () => {
-    if (!reduced.matches) return;
+    if (!reduced.matches) { observe(); return; }
+    observer.disconnect();
     animations.forEach(animation => animation.cancel());
     document.querySelectorAll('[data-reveal-pending]').forEach(element => element.removeAttribute('data-reveal-pending'));
   });
@@ -162,7 +172,7 @@ function setupReveals(scope: PageScope) {
 function setupSkills(scope: PageScope) {
   const container = document.querySelector<HTMLElement>('#skills-container');
   if (!container) return;
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const reduced = reducedMotion;
   let dispose: (() => void) | undefined;
   let loading = false;
   const start = async () => {
@@ -187,6 +197,35 @@ function setupSkills(scope: PageScope) {
   });
 }
 
+function setupMotionControl(copy: ClientCopy, scope: PageScope) {
+  const button = document.querySelector<HTMLButtonElement>('#motion-toggle');
+  const label = document.querySelector('#motion-label');
+  if (!button || !label) return;
+  const sync = () => {
+    button.setAttribute('aria-pressed', String(!reducedMotion.matches));
+    button.setAttribute('aria-label', copy[reducedMotion.matches ? 'motion-enable' : 'motion-reduce']);
+    button.title = copy[reducedMotion.matches ? 'motion-enable' : 'motion-reduce'];
+    if (label.textContent !== copy['nav-motion']) label.textContent = copy['nav-motion'];
+  };
+  scope.on(button, 'click', () => reducedMotion.setPreference(reducedMotion.matches ? 'full' : 'reduced'));
+  scope.on(reducedMotion, 'change', sync);
+  scope.on(document, 'portfolio:language' as keyof DocumentEventMap, sync);
+  sync(); button.hidden = false;
+}
+
+let initialMount = true;
+function setupArrival(scope: PageScope) {
+  if (reducedMotion.matches) return;
+  const animations = [...document.querySelectorAll('.hero > .portrait-link, .hero > h1, .hero > p, .project-detail > .project-title')].map(element => {
+    const animation = element.animate([{ opacity: .85, transform: 'translateY(16px)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('reveal'), easing: motionEase() });
+    animation.id = 'portfolio-arrival'; return animation;
+  });
+  const finish = () => animations.forEach(animation => { if (animation.playState === 'running') animation.finish(); });
+  scope.on(document, 'portfolio:before-navigation' as keyof DocumentEventMap, finish);
+  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) finish(); });
+  scope.add(() => animations.forEach(animation => animation.cancel()));
+}
+
 function initialize(): () => void {
   const scope = new PageScope();
   window.portfolioScroll.enhance();
@@ -196,12 +235,14 @@ function initialize(): () => void {
   const copy: ClientCopy = JSON.parse(payload);
   scope.on(document, 'portfolio:language' as keyof DocumentEventMap, event => Object.assign(copy, (event as CustomEvent).detail));
   setupTheme(copy, scope);
+  setupMotionControl(copy, scope);
   setupLanguages(scope);
   setupGlass(scope);
   setupCopy(copy, scope);
   setupDeferredLightbox(copy, scope);
   setupReveals(scope);
   setupSkills(scope);
+  if (initialMount) { setupArrival(scope); initialMount = false; }
   requestAnimationFrame(() => document.documentElement.classList.add('motion-ready'));
   return scope.dispose;
 }

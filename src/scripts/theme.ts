@@ -63,7 +63,7 @@ export function setupTheme(copy: ClientCopy, scope: PageScope) {
   // the shared text tokens in phase three rather than inheriting a depth delay.
   document.body.dataset.themeGroup = 'background';
   document.body.querySelectorAll('*').forEach(element => {
-    element.setAttribute('data-theme-group', element.matches('h1,h2,h3,h4,p,dt,dd,time,svg,svg *,span:not(.media-frame)') ? 'text' : 'components');
+    element.setAttribute('data-theme-group', element.matches('.page-environment, .page-environment *') ? 'background' : element.matches('h1,h2,h3,h4,p,dt,dd,time,svg,svg *,span:not(.media-frame)') ? 'text' : 'components');
   });
   scope.add(() => { revision++; animation?.cancel(); clean(); });
   scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });

@@ -6,6 +6,10 @@
   try { theme = localStorage.getItem('theme'); } catch {}
   const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
   root.dataset.theme = dark ? 'dark' : 'light';
+  let motion;
+  try { motion = localStorage.getItem('portfolio-motion'); } catch {}
+  root.dataset.motion = motion === 'full' ? 'full' : motion === 'reduced' || matchMedia('(prefers-reduced-motion: reduce)').matches ? 'reduced' : 'full';
+  if (motion === 'full' || motion === 'reduced') root.dataset.motionOverride = motion;
   document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#292929' : '#ececec');
 
   const cache = new Map();
