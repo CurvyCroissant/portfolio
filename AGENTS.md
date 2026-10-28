@@ -1,0 +1,15 @@
+# Portfolio project instructions
+
+- Maintain Astro static output, TypeScript, native semantic HTML and progressive enhancement. Keep English, Indonesian and Japanese copy complete and accurate, including metadata and accessible labels. Technical Skills pills always use their English labels.
+- Terminal and all skeleton loaders are removed; do not restore them. Use small blurred image previews with reserved dimensions. Keep the hero portrait, critical navigation, text and preferences eager; lazy-load below-fold images, skills physics near visibility, and the image viewer on intent/activation. Full-resolution viewer images load on demand.
+- Page navigation uses spatial slide transitions and preserves native history/scroll restoration. Language changes update the existing DOM, preserving exact scroll pixels, image identities, carousel positions and physics. Wipe outgoing text right-to-left, then incoming text left-to-right at equal linear speeds. Resize intrinsic labels horizontally; hold container heights throughout the animation and release on completion/cancellation. Cancel stale requests on rapid switches.
+- Use pastel warm light and muted slate dark backgrounds with coordinated surfaces, borders, text and interactive states. Theme colors transition from outer surfaces to nested containers to inner text.
+- All dropdowns support mouse hover, keyboard focus/Escape and mobile taps. Hover-open menus stay open on the first mouse click and dismiss on departure, outside click, window blur or navigation. Keep menus inside the viewport and panels inert when closed.
+- Interactable components need pronounced, consistent hover/focus and touch pressed feedback. Apply clicked state at popup activation, never after closing. Preserve keyboard access and focus restoration.
+- Carousels scroll only horizontally internally; vertical gestures must continue scrolling the page. Never intercept vertical wheel/touch gestures.
+- Footer contact containers have equal heights and consistent spacing across desktop, tablet, phone, landscape and enlarged text layouts.
+- Update this file with notable new instructions before implementation. Validate type checking, production builds, meaningful interaction tests and responsive layouts. Report verification limits.
+
+- Page and language animations must respect reduced motion, cancel cleanly on rapid navigation, and restore temporary styles. Theme staggering must expire after the color change so later hover feedback stays immediate. Keep static skill pills readable while their optional physics code loads.
+- If a shorter translation would clamp the current scroll position, retain only the minimum document height needed to preserve that position. Recalculate this reserve on the next language change; never shrink the scroll range during a text wipe.
+- Commit language route state with its text and metadata so Back/Forward during either wipe phase cannot leave the URL and language out of sync. Keep translated theme labels, their sizing hints and accessible names synchronized with the active theme. Keyboard dropdown selection restores focus to its toggle.

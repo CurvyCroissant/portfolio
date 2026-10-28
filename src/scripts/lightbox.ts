@@ -90,6 +90,12 @@ export function setupLightbox(copy: ClientCopy, scope: PageScope) {
     if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey || document.querySelector('dialog[open]')) return;
     event.preventDefault();
     opener = trigger;
+    trigger.dataset.clicked = '';
+    const preview = trigger.querySelector<HTMLImageElement>('img.media-preview, img');
+    const previewURL = trigger.dataset.preview || preview?.currentSrc || preview?.src;
+    loader.style.backgroundImage = previewURL ? `url("${previewURL}")` : '';
+    // Commit action state before the modal makes the rest of the document inert.
+    trigger.setAttribute('data-viewed', 'true');
     const currentRequest = ++request;
     closing = false; moved = false;
     rotation = Number(trigger.dataset.rotation) || 0; zoom = 1; panX = panY = 0;

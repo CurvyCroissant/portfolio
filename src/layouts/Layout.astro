@@ -1,8 +1,6 @@
 ---
 import '../styles/global.css';
 import Icon from '../components/Icon.astro';
-import Skeleton from '../components/Skeleton.astro';
-import NavigationSkeleton from '../components/NavigationSkeleton.astro';
 import bootstrap from '../scripts/bootstrap.js?raw';
 import { site } from '../data/site';
 import { absoluteUrl, clientCopy, languageNames, locales, routePath, t, type Locale } from '../lib/i18n';
@@ -18,7 +16,7 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="description" content={description} />
-    <meta name="theme-color" content="#fafafa" />
+    <meta name="theme-color" content="#f0eee8" />
     <meta name="color-scheme" content="light dark" />
     <meta name="robots" content={noindex ? 'noindex,follow' : 'index,follow'} />
     <title>{title}</title>
@@ -50,7 +48,6 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
     <header class="site-header">
       {page && <a href={routePath(locale)} class="back-link control" aria-label={t(locale, 'back-home')}><Icon name="back" size={18} /><span class="back-full">{t(locale, 'back-home').replace(/^←\s*/, '')}</span><span class="back-short">{t(locale, 'back-short')}</span></a>}
       <div class="floating-controls">
-        <button id="term-trigger" class="control" type="button" aria-label={t(locale, 'open-terminal')} aria-haspopup="dialog" aria-controls="terminal-dialog" hidden><span class="toggle-text">{t(locale, 'nav-term')}</span><Icon name="terminal" /></button>
         <details class="lang-dropdown" id="lang-dropdown">
           <summary id="lang-toggle" class="control" aria-label={`${t(locale, 'language-label')} (${languageNames[locale]})`}><span class="locale-code">{locale.toUpperCase()}</span><Icon name="globe" /></summary>
           <nav class="lang-menu" aria-label={t(locale, 'language-label')}>
@@ -61,24 +58,15 @@ const json = (value: unknown) => JSON.stringify(value).replace(/</g, '\\u003c');
       </div>
     </header>
     <slot />
-    <NavigationSkeleton locale={locale} />
     <dialog class="lightbox" id="lightbox" aria-labelledby="lightbox-title">
       <h2 class="sr-only" id="lightbox-title">{t(locale, 'image-viewer')}</h2>
       <div class="lightbox-stage" id="lightbox-stage">
         <div class="lightbox-media" id="lightbox-media" data-media-state="loading">
-          <div id="lightbox-loader" aria-hidden="true"><Skeleton /></div>
+          <div id="lightbox-loader" aria-hidden="true"></div>
           <img id="lightbox-image" alt="" decoding="async" hidden />
         </div>
         <p class="sr-only" id="lightbox-status" role="status"></p>
       </div>
-    </dialog>
-    <dialog class="terminal-dialog" id="terminal-dialog" aria-labelledby="terminal-title" aria-describedby="term-intro">
-      <div class="terminal-header"><h2 id="terminal-title"><Icon name="terminal" size={18} />{t(locale, 'terminal-title')}</h2><button class="icon-button" id="terminal-close" type="button" aria-label={t(locale, 'close')}><Icon name="close" /></button></div>
-      <div class="terminal-body">
-        <p id="term-intro">{t(locale, 'term-intro')}</p><div id="term-history"></div>
-        <form id="terminal-form"><label class="sr-only" for="term-input">{t(locale, 'terminal-command')}</label><span class="term-prompt" aria-hidden="true">C:\Aaron-Nathanael&gt;</span><input id="term-input" type="text" name="command" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="send" autofocus /></form>
-      </div>
-      <p class="sr-only" id="terminal-status" role="status"></p>
     </dialog>
     <script is:inline type="application/json" id="site-copy" set:html={json(clientCopy(locale))} />
     <script src="../scripts/main.ts"></script>

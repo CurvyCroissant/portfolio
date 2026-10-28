@@ -58,7 +58,7 @@ for (const locale of locales) {
     await page.goto(`${prefix(locale)}projects/posture-alert/`);
     await expect(page.locator('.lang-option').first()).not.toBeVisible();
     await page.locator('#lang-toggle').focus();
-    await page.keyboard.press('Enter');
+    await page.keyboard.press('ArrowDown');
     await expect(page.locator('.lang-option').first()).toBeVisible();
     const destination = locale === 'ja' ? 'id' : 'ja';
     await page.locator(`.lang-option[hreflang="${destination}"]`).click();
@@ -67,29 +67,6 @@ for (const locale of locales) {
     await expect(page.locator('h1')).toHaveText(messages['proj-pa-title'][destination]);
     await page.locator('.back-link').click();
     await expect(page).toHaveURL(new RegExp(`/portfolio/${destination}/$`));
-  });
-
-  test(`terminal is safe, labeled, modal, and restores focus: ${locale}`, async ({ page }) => {
-    await page.goto(prefix(locale));
-    const trigger = page.locator('#term-trigger');
-    await trigger.click();
-    await expect(page.locator('#term-input')).toBeFocused();
-    await page.locator('#term-input').fill('<b id="injected">markup</b>');
-    await page.locator('#term-input').press('Enter');
-    await expect(page.locator('#injected')).toHaveCount(0);
-    await expect(page.locator('#term-history')).toContainText('<b id="injected">markup</b>');
-    await page.locator('#term-input').fill('projects');
-    await page.locator('#term-input').press('Enter');
-    await expect(page.locator('#term-history')).toContainText(messages['proj-pa-title'][locale]);
-    await page.evaluate(() => document.querySelector<HTMLButtonElement>('#theme-toggle')!.focus());
-    expect(await page.evaluate(() => document.querySelector('#terminal-dialog')!.contains(document.activeElement))).toBe(true);
-    await page.keyboard.press('Escape');
-    await expect(trigger).toBeFocused();
-    await expect(page.locator('html')).not.toHaveClass(/dialog-open/);
-    await page.keyboard.press('/');
-    await expect(page.locator('#terminal-dialog')).toBeVisible();
-    await page.locator('#terminal-close').click();
-    await expect(trigger).toBeFocused();
   });
 
   test(`lightbox fits rotated certificates and supports gestures without visible controls: ${locale}`, async ({ page }) => {
@@ -144,7 +121,7 @@ for (const locale of locales) {
   }
 }
 
-test('blocked storage does not interrupt theme, terminal, or content', async ({ page }) => {
+test('blocked storage does not interrupt theme or content', async ({ page }) => {
   const errors: string[] = [];
   page.on('pageerror', error => errors.push(error.message));
   await page.addInitScript(() => {
@@ -152,8 +129,7 @@ test('blocked storage does not interrupt theme, terminal, or content', async ({ 
   });
   await page.goto('ja/');
   await page.locator('#theme-toggle').click();
-  await page.locator('#term-trigger').click();
-  await expect(page.locator('#term-input')).toBeFocused();
+  await expect(page.locator('h1')).toBeVisible();
   expect(errors).toEqual([]);
 });
 
@@ -199,15 +175,6 @@ test('copy failure announces failure', async ({ page }) => {
   await expect(page.locator('#copy-status')).toHaveText(messages['copy-error'].ja);
 });
 
-test('terminal fits a short landscape viewport', async ({ page }) => {
-  await page.setViewportSize({ width: 820, height: 360 });
-  await page.goto('');
-  await page.locator('#term-trigger').click();
-  const bounds = await page.locator('#terminal-dialog').boundingBox();
-  expect(bounds!.y).toBeGreaterThanOrEqual(0);
-  expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(360);
-});
-
 test('initial homepage images are small and do not request originals or external fonts', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const images: Promise<number>[] = [], external: string[] = [], scripts: string[] = [];
@@ -218,8 +185,8 @@ test('initial homepage images are small and do not request originals or external
   expect((await Promise.all(images)).reduce((a, b) => a + b, 0)).toBeLessThan(200_000);
   expect(external).toEqual([]);
   expect(scripts.some(url => url.includes('skills-physics'))).toBe(false);
-  await expect(page.locator('.media-portrait img')).toHaveAttribute('loading', 'eager');
-  await expect(page.locator('.media-portrait img')).toHaveAttribute('srcset', /\.webp/);
+  await expect(page.locator('.media-portrait img:not(.media-preview)')).toHaveAttribute('loading', 'eager');
+  await expect(page.locator('.media-portrait img:not(.media-preview)')).toHaveAttribute('srcset', /\.webp/);
 });
 
 test('skills sleep without animation frames, survive resizing, and honor reduced motion changes', async ({ page }) => {

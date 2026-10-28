@@ -4,7 +4,7 @@ import type { Body, Constraint } from 'matter-js';
 /** A decorative enhancement: readable flex layout first, physics only during interaction. */
 export async function setupPhysics(container: HTMLElement): Promise<() => void> {
   await document.fonts.ready;
-  const engine = Matter.Engine.create({ enableSleeping: true, positionIterations: 10, velocityIterations: 8, constraintIterations: 4 });
+  const engine = Matter.Engine.create({ enableSleeping: true, positionIterations: 20, velocityIterations: 12, constraintIterations: 6 });
   engine.gravity.x = engine.gravity.y = 0;
   const pills = [...container.querySelectorAll<HTMLElement>('.skill-pill')];
   let bodies: { element: HTMLElement; body: Body; width: number; height: number; x: number; y: number }[] = [];
@@ -12,7 +12,7 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
   let lastTime = 0, accumulator = 0, lastWidth = 0;
   let visible = false, disposed = false;
   let drag: { pointer: number; element: HTMLElement; constraint: Constraint; target: { x: number; y: number } } | undefined;
-  const step = 1000 / 120;
+  const step = 1000 / 240;
   const wake = () => bodies.forEach(item => Matter.Sleeping.set(item.body, false));
 
   const draw = () => {
@@ -37,7 +37,7 @@ export async function setupPhysics(container: HTMLElement): Promise<() => void> 
         // in small steps so the collision solver sees every pill along the path.
         const anchor = drag.constraint.pointA;
         const dx = drag.target.x - anchor.x, dy = drag.target.y - anchor.y;
-        const ratio = Math.min(1, 4 / (Math.hypot(dx, dy) || 1));
+        const ratio = Math.min(1, 2 / (Math.hypot(dx, dy) || 1));
         anchor.x += dx * ratio; anchor.y += dy * ratio;
       }
       for (const item of bodies) {

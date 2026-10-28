@@ -1,3 +1,5 @@
+import { reducedMotion, motionEase } from './motion';
+import { translatePage } from './text-transition';
 export interface ScrollPosition { y: number; anchor?: string; offset?: number }
 export interface PageState { portfolioEntry?: string; [key: string]: unknown }
 interface ScrollMemory {
@@ -12,7 +14,7 @@ interface ScrollMemory {
 }
 declare global { interface Window { portfolioScroll: ScrollMemory } }
 
-/** Fetches only static HTML. Images load independently through their shared skeleton. */
+/** Fetches only static HTML. Critical content stays available while HTML is fetched. */
 export function setupNavigation(mount: () => (() => void)) {
   const memory = window.portfolioScroll;
   const root = document.documentElement;
@@ -21,34 +23,17 @@ export function setupNavigation(mount: () => (() => void)) {
   let currentState: PageState = history.state;
   let active: AbortController | undefined;
   let sequence = 0;
+  let pageAnimation: Animation | undefined;
+  const cancelPageAnimation = () => { pageAnimation?.cancel(); pageAnimation = undefined; };
   const assetSignature = (page: Document) => [...page.querySelectorAll<HTMLLinkElement | HTMLScriptElement>('link[rel="stylesheet"], script[type="module"][src]')].map(element => element.getAttribute(element.tagName === 'LINK' ? 'href' : 'src')).sort().join('|');
   // The executed script may be removed with the old body; retain its version.
   const loadedAssets = assetSignature(document);
   const metaSelector = 'meta[name="description"], meta[name="robots"], meta[property], meta[name^="twitter:"], link[rel="canonical"], link[rel="alternate"]';
-  const localeFor = (url: URL) => url.pathname.split('/')[2] === 'id' ? 'id' : url.pathname.split('/')[2] === 'ja' ? 'ja' : 'en';
   const saveCurrent = () => memory.remember(currentURL.href, currentState, memory.capture());
-  const showLoading = (url: URL) => {
-    const loader = document.querySelector<HTMLElement>('#navigation-loader');
-    if (!loader) return;
-    const locale = localeFor(url);
-    root.dataset.navigating = url.pathname.includes('/projects/') ? 'project' : 'home';
-    loader.hidden = false;
-    loader.classList.remove('navigation-failed');
-    loader.setAttribute('aria-busy', 'true');
-    loader.querySelector<HTMLElement>('#navigation-error')!.hidden = true;
-    loader.querySelector('#navigation-status')!.textContent = loader.dataset[`loading${locale[0].toUpperCase()}${locale.slice(1)}`] ?? '';
-    document.querySelector('main')?.setAttribute('inert', '');
-    document.querySelector('footer')?.setAttribute('inert', '');
-  };
-  const clearLoading = () => {
-    delete root.dataset.navigating;
-    const loader = document.querySelector<HTMLElement>('#navigation-loader');
-    if (loader) { loader.hidden = true; loader.setAttribute('aria-busy', 'false'); }
-    document.querySelector('main')?.removeAttribute('inert');
-    document.querySelector('footer')?.removeAttribute('inert');
-  };
+  const clearLoading = () => { delete root.dataset.navigating; document.querySelector('main')?.removeAttribute('aria-busy'); };
   const navigate = async (url: URL, traverse = false, carriedPosition?: ScrollPosition) => {
     active?.abort();
+    cancelPageAnimation();
     const controller = new AbortController();
     active = controller;
     const serial = ++sequence;
@@ -60,7 +45,9 @@ export function setupNavigation(mount: () => (() => void)) {
       try { history.pushState(state, '', url); }
       catch { location.assign(url.href); return; }
     }
-    showLoading(url);
+    root.dataset.navigating = '';
+    document.querySelector('main')?.setAttribute('aria-busy', 'true');
+    document.dispatchEvent(new Event('portfolio:before-navigation'));
     try {
       const response = await fetch(url.href, { signal: controller.signal, headers: { Accept: 'text/html' } });
       if (!response.ok || !response.headers.get('content-type')?.includes('text/html')) throw new Error('Page request failed');
@@ -70,12 +57,52 @@ export function setupNavigation(mount: () => (() => void)) {
       // A new deployment may have changed the shared application/CSS bundle.
       if (assetSignature(incoming) !== loadedAssets) { location.replace(url.href); return; }
       incoming.body.querySelectorAll('script:not([type="application/json"])').forEach(script => script.remove());
-      dispose();
+      const languageOnly = document.querySelector('main')?.dataset.page === incoming.querySelector<HTMLElement>('main')?.dataset.page && currentURL.pathname.replace(/\/(id|ja)(?=\/)/, '') === url.pathname.replace(/\/(id|ja)(?=\/)/, '');
+      const updateHead = () => {
       document.title = incoming.title;
       document.head.querySelectorAll(metaSelector).forEach(element => element.remove());
       incoming.head.querySelectorAll(metaSelector).forEach(element => document.head.append(document.importNode(element, true)));
       root.lang = incoming.documentElement.lang;
       root.toggleAttribute('data-home', incoming.documentElement.hasAttribute('data-home'));
+      };
+      if (languageOnly) {
+        // Static HTML describes the default theme. Translate the live theme's
+        // label instead, without replacing its animated text node at commit.
+        const payload = incoming.querySelector('#site-copy')!.textContent!;
+        const copy = JSON.parse(payload);
+        const dark = root.dataset.theme === 'dark';
+        const themeLabel = incoming.querySelector('#theme-label');
+        if (themeLabel) themeLabel.textContent = copy[dark ? 'nav-theme-light' : 'nav-theme-dark'];
+        incoming.querySelector('#theme-toggle')?.setAttribute('aria-label', copy[dark ? 'theme-to-light' : 'theme-to-dark']);
+        await translatePage(incoming, controller.signal, () => {
+          updateHead();
+          const selector = 'a, [aria-label], [data-title], [data-measure], img';
+          const old = [...document.querySelectorAll(selector)], next = [...incoming.querySelectorAll(selector)];
+          old.forEach((el, i) => {
+            const fresh = next[i]; if (!fresh || fresh.tagName !== el.tagName) return;
+            for (const attr of ['href', 'lang', 'hreflang', 'aria-label', 'aria-current', 'alt', 'data-title', 'data-measure']) {
+              if (fresh.hasAttribute(attr)) el.setAttribute(attr, fresh.getAttribute(attr)!); else el.removeAttribute(attr);
+            }
+          });
+          document.querySelector('#site-copy')!.textContent = payload;
+          document.dispatchEvent(new CustomEvent('portfolio:language', { detail: copy }));
+          // History must track the DOM as soon as translated text is committed,
+          // including when Back interrupts the incoming animation.
+          currentURL = url; currentState = history.state;
+        });
+        if (controller.signal.aborted) return;
+        clearLoading(); memory.save(); return;
+      }
+      const oldBody = document.body;
+      const direction = url.pathname.length < currentURL.pathname.length ? -1 : 1;
+      if (!reducedMotion.matches) {
+        pageAnimation = oldBody.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${-direction * 6}vw)`, opacity: 0 }], { duration: 250, easing: 'ease-in', fill: 'forwards' });
+        controller.signal.addEventListener('abort', cancelPageAnimation, { once: true });
+        await pageAnimation.finished.catch(() => {});
+      }
+      if (controller.signal.aborted) { oldBody.getAnimations().forEach(a => a.cancel()); return; }
+      cancelPageAnimation();
+      dispose(); updateHead();
       document.body.replaceWith(document.importNode(incoming.body, true));
       currentURL = url;
       currentState = history.state;
@@ -85,28 +112,18 @@ export function setupNavigation(mount: () => (() => void)) {
       dispose = mount();
       memory.restore(position);
       clearLoading();
+      if (!reducedMotion.matches) {
+        pageAnimation = document.body.animate([{ transform: `translateX(${direction * 12}vw)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: motionEase() });
+      }
       if (url.hash) document.getElementById(decodeURIComponent(url.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' });
       const heading = document.querySelector<HTMLElement>('main h1');
       if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
       memory.save();
     } catch {
       if (controller.signal.aborted || serial !== sequence) return;
-      const loader = document.querySelector<HTMLElement>('#navigation-loader');
-      if (!loader) { location.replace(url.href); return; }
-      const locale = localeFor(url);
-      const suffix = locale[0].toUpperCase() + locale.slice(1);
-      loader.classList.add('navigation-failed');
-      loader.setAttribute('aria-busy', 'false');
-      loader.querySelector<HTMLElement>('#navigation-error')!.hidden = false;
-      loader.querySelector('#navigation-error-text')!.textContent = loader.dataset[`error${suffix}`] ?? '';
-      loader.querySelector('#navigation-status')!.textContent = loader.dataset[`error${suffix}`] ?? '';
-      const retry = loader.querySelector<HTMLButtonElement>('#navigation-retry')!;
-      const back = loader.querySelector<HTMLButtonElement>('#navigation-back')!;
-      retry.textContent = loader.dataset[`retry${suffix}`] ?? '';
-      back.textContent = loader.dataset[`back${suffix}`] ?? '';
-      retry.onclick = () => { void navigate(url, true, position); };
-      back.onclick = () => history.back();
-      retry.focus({ preventScroll: true });
+      cancelPageAnimation();
+      clearLoading();
+      location.assign(url.href);
     }
   };
   document.addEventListener('click', event => {

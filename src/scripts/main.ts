@@ -1,9 +1,8 @@
 import type { ClientCopy } from '../lib/i18n';
-import { setupLightbox } from './lightbox';
-import { readStorage, updateScrollLock, writeStorage } from './preferences';
+import { readStorage, writeStorage } from './preferences';
 import { PageScope } from './lifecycle';
 import { setupNavigation } from './navigation';
-import { motionDuration, motionEase, reducedMotion } from './motion';
+import { motionDuration, motionEase } from './motion';
 
 function setupTheme(copy: ClientCopy, scope: PageScope) {
   const button = document.querySelector<HTMLButtonElement>('#theme-toggle');
@@ -12,15 +11,31 @@ function setupTheme(copy: ClientCopy, scope: PageScope) {
   const system = matchMedia('(prefers-color-scheme: dark)');
   const apply = (dark: boolean) => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0a0a0a' : '#fafafa');
-    label.textContent = copy[dark ? 'nav-theme-light' : 'nav-theme-dark'];
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#282b36' : '#f0eee8');
+    const text = copy[dark ? 'nav-theme-light' : 'nav-theme-dark'];
+    if (label.textContent !== text) {
+      const node = label.querySelector('.translation-text')?.firstChild ?? label.firstChild;
+      if (node?.nodeType === Node.TEXT_NODE) node.textContent = text;
+      else label.textContent = text;
+    }
+    label.setAttribute('data-measure', copy['nav-theme-light']);
     button.setAttribute('aria-label', copy[dark ? 'theme-to-light' : 'theme-to-dark']);
   };
+  let themeTimer: ReturnType<typeof setTimeout>;
+  const resetThemeDelays = () => document.querySelectorAll<HTMLElement>('[style*="--theme-delay"]').forEach(element => element.style.removeProperty('--theme-delay'));
+  scope.add(() => { clearTimeout(themeTimer); resetThemeDelays(); });
   apply(document.documentElement.dataset.theme === 'dark');
+  scope.on(document, 'portfolio:language' as keyof DocumentEventMap, () => apply(document.documentElement.dataset.theme === 'dark'));
   scope.on(button, 'click', () => {
     const dark = document.documentElement.dataset.theme !== 'dark';
     writeStorage('localStorage', 'theme', dark ? 'dark' : 'light');
+    document.querySelectorAll<HTMLElement>('body, body *').forEach(element => {
+      let depth = 0; for (let node = element.parentElement; node && node !== document.body; node = node.parentElement) depth++;
+      element.style.setProperty('--theme-delay', `${Math.min(depth, 7) * 65}ms`);
+    });
     apply(dark);
+    clearTimeout(themeTimer);
+    themeTimer = setTimeout(resetThemeDelays, 1200);
   });
   scope.on(system, 'change', () => {
     const saved = readStorage('localStorage', 'theme');
@@ -32,101 +47,61 @@ function setupTheme(copy: ClientCopy, scope: PageScope) {
 function setupLanguages(scope: PageScope) {
   const details = document.querySelector<HTMLDetailsElement>('#lang-dropdown');
   if (!details) return;
-  scope.on(document, 'click', event => { if (!details.contains(event.target as Node)) details.open = false; });
-  scope.on(document, 'keydown', event => {
-    if (event.key === 'Escape' && details.open) {
-      details.open = false;
-      details.querySelector<HTMLElement>('summary')?.focus();
+  let hovered = false;
+  let restoringFocus = false;
+  const toggle = details.querySelector<HTMLElement>('summary');
+  const panel = details.querySelector<HTMLElement>('.lang-menu');
+  const sync = () => { if (panel) panel.inert = !details.open; };
+  sync();
+  const close = (restoreFocus = false) => {
+    if (restoreFocus) {
+      restoringFocus = true;
+      toggle?.focus({ preventScroll: true });
+      restoringFocus = false;
     }
+    details.open = false; hovered = false; sync();
+  };
+  scope.on(details, 'toggle', sync);
+  scope.on(details, 'focusin', event => {
+    if (!restoringFocus && event.target === toggle && toggle?.matches(':focus-visible')) { details.open = true; sync(); }
+  });
+  scope.on(details, 'focusout', event => {
+    if (event.relatedTarget instanceof Node && !details.contains(event.relatedTarget)) close();
+  });
+  scope.on(details, 'pointerenter', event => { if (event.pointerType === 'mouse') { hovered = true; details.open = true; sync(); } });
+  scope.on(details, 'pointerleave', event => { if (event.pointerType === 'mouse') close(panel?.contains(document.activeElement)); });
+  scope.on(details, 'pointerdown', event => { if (event.pointerType === 'touch') hovered = false; });
+  scope.on(toggle, 'click', event => { if (hovered && event.detail > 0) event.preventDefault(); });
+  scope.on(details, 'keydown', event => {
+    if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && event.target === toggle) {
+      event.preventDefault(); details.open = true; sync();
+      const options = panel?.querySelectorAll<HTMLElement>('a[href]');
+      (event.key === 'ArrowDown' ? options?.[0] : options?.[options.length - 1])?.focus();
+    }
+  });
+  scope.on(details, 'click', event => { if ((event.target as Element).closest('a')) close(true); });
+  scope.on(document, 'click', event => { if (!details.contains(event.target as Node)) close(); });
+  scope.on(document, 'portfolio:before-navigation' as keyof DocumentEventMap, () => close());
+  scope.on(window, 'blur', () => close());
+  scope.on(document, 'visibilitychange', () => { if (document.hidden) close(); });
+  scope.on(document, 'keydown', event => {
+    if (event.key === 'Escape' && details.open) { event.preventDefault(); close(true); }
   });
 }
 
-function setupTerminal(copy: ClientCopy, scope: PageScope) {
-  const dialog = document.querySelector<HTMLDialogElement>('#terminal-dialog');
-  const input = document.querySelector<HTMLInputElement>('#term-input');
-  const form = document.querySelector<HTMLFormElement>('#terminal-form');
-  const history = document.querySelector('#term-history');
-  const trigger = document.querySelector<HTMLButtonElement>('#term-trigger');
-  const status = document.querySelector('#terminal-status');
-  if (!dialog || !input || !form || !history || !trigger || typeof dialog.showModal !== 'function') return;
-  let opener: HTMLElement | null = null;
-  let animation: Animation | undefined, closing = false;
-  scope.add(() => { animation?.cancel(); if (dialog.open) dialog.close(); updateScrollLock(); });
-  const open = () => {
-    if (document.querySelector('dialog[open]')) return;
-    opener = document.activeElement instanceof HTMLElement ? document.activeElement : trigger;
-    dialog.showModal();
-    updateScrollLock();
-    input.focus({ preventScroll: true });
-    if (motionDuration('dialog')) animation = dialog.animate([{ opacity: 0, transform: 'translateY(20px) scale(.96)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('dialog'), easing: motionEase() });
-  };
-  const close = async () => {
-    if (closing || !dialog.open) return;
-    closing = true;
-    const transform = getComputedStyle(dialog).transform;
-    const opacity = getComputedStyle(dialog).opacity;
-    animation?.cancel();
-    dialog.dataset.closing = '';
-    if (motionDuration('dialog')) {
-      animation = dialog.animate([{ opacity, transform }, { opacity: 0, transform: 'translateY(20px) scale(.96)' }], { duration: motionDuration('dialog'), easing: motionEase(), fill: 'forwards' });
-      await animation.finished.catch(() => {});
-    }
-    if (dialog.open) dialog.close();
-  };
-  scope.on(trigger, 'click', open);
-  trigger.hidden = false;
-  scope.on(document.querySelector('#terminal-close'), 'click', () => { void close(); });
-  scope.on(dialog, 'cancel', event => { event.preventDefault(); void close(); });
-  scope.on(dialog, 'click', event => {
-    if (event.target !== dialog) return;
-    const bounds = dialog.getBoundingClientRect();
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) void close();
-  });
-  scope.on(dialog, 'close', () => {
-    animation?.cancel(); animation = undefined;
-    closing = false;
-    delete dialog.dataset.closing;
-    input.value = '';
-    updateScrollLock();
-    opener?.focus({ preventScroll: true });
-  });
-  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });
-  scope.on(document.querySelector('.terminal-body'), 'click', event => {
-    if (!(event.target as HTMLElement).closest('a, button') && !getSelection()?.toString()) input.focus({ preventScroll: true });
-  });
-  scope.on(document, 'keydown', event => {
-    const target = event.target as HTMLElement;
-    if (event.key === '/' && !event.ctrlKey && !event.metaKey && !event.altKey && !target.isContentEditable && !['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName)) {
-      event.preventDefault(); open();
-    }
-  });
-  const print = (text: string, command = false) => {
-    const line = document.createElement('p');
-    line.className = 'term-line';
-    line.textContent = command ? `C:\\Aaron-Nathanael>${text}` : text;
-    history.append(line);
-    // Bound retained history without interpreting any command as HTML.
-    while (history.childElementCount > 200) history.firstElementChild?.remove();
-  };
-  scope.on(form, 'submit', event => {
+function setupDeferredLightbox(copy: ClientCopy, scope: PageScope) {
+  let ready = false;
+  let loading: Promise<void> | undefined;
+  const load = () => loading ??= import('./lightbox').then(({setupLightbox}) => {
+    if (!scope.signal.aborted) { setupLightbox(copy, scope); ready = true; }
+  }).catch(() => { loading = undefined; });
+  scope.on(document, 'pointerover', event => { if ((event.target as Element).closest('[data-lightbox]')) void load(); });
+  scope.on(document, 'focusin', event => { if ((event.target as Element).closest('[data-lightbox]')) void load(); });
+  scope.on(document, 'click', event => {
+    const trigger = (event.target as Element).closest<HTMLAnchorElement>('[data-lightbox]');
+    if (!trigger || ready || event.defaultPrevented || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
-    const raw = input.value.trim();
-    if (!raw) return;
-    input.value = '';
-    const command = raw.toLowerCase();
-    if (command === 'exit') { void close(); return; }
-    if (command === 'clear') {
-      history.replaceChildren();
-      const intro = document.querySelector<HTMLElement>('#term-intro');
-      if (intro) intro.hidden = true;
-      if (status) status.textContent = copy['terminal-cleared'];
-      return;
-    }
-    print(raw, true);
-    const output = Object.hasOwn(copy.terminal, command) ? copy.terminal[command as keyof typeof copy.terminal] : copy.unknownCommand.replace('{command}', () => raw);
-    print(output);
-    if (status) status.textContent = copy['terminal-updated'];
-    input.scrollIntoView({ block: 'nearest' });
+    void load().then(() => { if (!scope.signal.aborted) { if (ready) trigger.click(); else location.assign(trigger.href); } });
   });
 }
 
@@ -238,11 +213,11 @@ function initialize(): () => void {
   const payload = document.querySelector('#site-copy')?.textContent;
   if (!payload) return scope.dispose;
   const copy: ClientCopy = JSON.parse(payload);
+  scope.on(document, 'portfolio:language' as keyof DocumentEventMap, event => Object.assign(copy, (event as CustomEvent).detail));
   setupTheme(copy, scope);
   setupLanguages(scope);
-  setupTerminal(copy, scope);
   setupCopy(copy, scope);
-  setupLightbox(copy, scope);
+  setupDeferredLightbox(copy, scope);
   setupReveals(scope);
   setupSkills(scope);
   requestAnimationFrame(() => document.documentElement.classList.add('motion-ready'));

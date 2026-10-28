@@ -14,11 +14,11 @@ test.beforeEach(async ({ page }) => {
 const departure = (page: import('@playwright/test').Page) => page.evaluate(() => (window as unknown as { __departures: number[] }).__departures.at(-1)!);
 
 const loaded = async (page: import('@playwright/test').Page) => {
-  await expect(page.locator('#navigation-loader')).not.toBeVisible();
+  await expect(page.locator('html')).not.toHaveAttribute('data-navigating');
   await expect(page.locator('#theme-toggle')).toBeVisible();
 };
 
-test('navigation changes the URL and shows a destination skeleton before HTML or images arrive', async ({ page }) => {
+test('navigation changes the URL and retains current content before HTML or images arrive', async ({ page }) => {
   await page.goto('');
   let releaseHTML!: () => void, releaseImages!: () => void;
   const html = new Promise<void>(resolve => { releaseHTML = resolve; });
@@ -27,16 +27,15 @@ test('navigation changes the URL and shows a destination skeleton before HTML or
   await page.route('**/*.webp', async route => { await images; await route.continue(); });
   await page.locator('.project-card').first().click();
   await expect(page).toHaveURL(/projects\/posture-alert\/$/);
-  await expect(page.locator('#navigation-loader')).toBeVisible();
-  await expect(page.locator('.navigation-project')).toBeVisible();
-  await expect(page.locator('main')).toHaveAttribute('inert', '');
+  await expect(page.locator('main')).toHaveAttribute('aria-busy', 'true');
+  await expect(page.locator('.hero')).toBeVisible();
   releaseHTML();
   await loaded(page);
   await expect(page.locator('h1')).toHaveText(messages['proj-pa-title'].en);
   const frame = page.locator('.cert-card .media-frame').first();
   await frame.scrollIntoViewIfNeeded();
   await expect(frame).toHaveAttribute('data-media-state', 'loading');
-  await expect(frame.locator('.skeleton-image')).toBeVisible();
+  await expect(frame.locator('.media-preview')).toBeVisible();
   releaseImages();
   await expect(frame).toHaveAttribute('data-media-state', 'ready');
 });
@@ -117,7 +116,7 @@ test('Back cancels a pending page load and a late response cannot replace the re
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/projects/posture-alert/', async route => { await pending; await route.continue().catch(() => {}); });
   await page.locator('.project-card').first().click();
-  await expect(page.locator('#navigation-loader')).toBeVisible();
+  await expect(page.locator('html')).toHaveAttribute('data-navigating', '');
   await page.goBack();
   await loaded(page);
   release();
@@ -127,7 +126,7 @@ test('Back cancels a pending page load and a late response cannot replace the re
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
 });
 
-test('a failed navigation offers retry and recovers without losing its URL', async ({ page }) => {
+test('a failed navigation falls back to native navigation', async ({ page }) => {
   await page.goto('');
   let failed = false;
   await page.route('**/projects/posture-alert/', route => {
@@ -136,13 +135,12 @@ test('a failed navigation offers retry and recovers without losing its URL', asy
   });
   await page.locator('.project-card').first().click();
   await expect(page).toHaveURL(/posture-alert\/$/);
-  await expect(page.locator('#navigation-error')).toBeVisible();
-  await page.locator('#navigation-retry').click();
+
   await loaded(page);
   await expect(page.locator('h1')).toHaveText(messages['proj-pa-title'].en);
 });
 
-test('modified links retain their default browser action without starting a skeleton', async ({ page }) => {
+test('modified links retain their default browser action without starting client navigation', async ({ page }) => {
   await page.goto('');
   await page.evaluate(() => {
     document.addEventListener('click', event => {
@@ -154,7 +152,7 @@ test('modified links retain their default browser action without starting a skel
   await page.locator('.project-card').first().dispatchEvent('click', { ctrlKey: true, button: 0 });
   expect(await page.evaluate(() => (window as unknown as { __modifiedLinkCancelled: boolean }).__modifiedLinkCancelled)).toBe(false);
   await expect(page).toHaveURL(/\/portfolio\/$/);
-  await expect(page.locator('#navigation-loader')).not.toBeVisible();
+  await expect(page.locator('html')).not.toHaveAttribute('data-navigating');
 });
 
 test('pills shuffle on refresh while retaining exactly the featured skills', async ({ page }) => {
@@ -250,13 +248,6 @@ test('repeated page visits do not duplicate handlers or leave physics frames run
     await loaded(page);
     await page.locator('#theme-toggle').click();
     await expect(page.locator('html')).toHaveAttribute('data-theme', i % 2 ? 'light' : 'dark');
-    await page.keyboard.press('/');
-    await expect(page.locator('#term-input')).toBeFocused();
-    await page.locator('#term-input').fill('help');
-    await page.keyboard.press('Enter');
-    await expect(page.locator('#term-history .term-line')).toHaveCount(2);
-    await page.keyboard.press('Escape');
-    await expect(page.locator('#terminal-dialog')).not.toBeVisible();
     await page.locator('.back-link').click();
     await loaded(page);
   }

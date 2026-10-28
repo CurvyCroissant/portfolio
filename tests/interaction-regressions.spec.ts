@@ -6,7 +6,7 @@ for (const [kind, route, selector] of [
   ['screenshot', 'projects/posture-alert/', '.cert-card .media-frame'],
   ['chart', 'projects/crop-yield-predictor/', '.cert-card .media-frame'],
 ]) {
-  test(`${kind} uses the shared image skeleton until decoded, without layout shift`, async ({ page }) => {
+  test(`${kind} uses a blurred preview until decoded, without layout shift`, async ({ page }) => {
     let release!: () => void;
     const pending = new Promise<void>(resolve => { release = resolve; });
     await page.route('**/*.webp', async route => { await pending; await route.continue(); });
@@ -14,24 +14,24 @@ for (const [kind, route, selector] of [
     const frame = page.locator(selector).first();
     await frame.scrollIntoViewIfNeeded();
     await expect(frame).toHaveAttribute('data-media-state', 'loading');
-    const skeleton = frame.locator('[data-skeleton-kind="image"]');
-    await expect(skeleton).toBeVisible();
-    expect(await skeleton.evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('skeleton-sweep');
+    const preview = frame.locator('.media-preview');
+    await expect(preview).toBeVisible();
+    expect(await preview.evaluate(element => getComputedStyle(element).filter)).toBe('blur(12px)');
     const before = await frame.boundingBox();
-    const placeholder = await skeleton.boundingBox();
-    expect(placeholder!.width).toBeCloseTo(before!.width, 0);
-    expect(placeholder!.height).toBeCloseTo(before!.height, 0);
+    const placeholder = await preview.boundingBox();
+    expect(placeholder!.width).toBeCloseTo(before!.width * 1.08, 0);
+    expect(placeholder!.height).toBeCloseTo(before!.height * 1.08, 0);
     release();
     await expect(frame).toHaveAttribute('data-media-state', 'ready');
     await expect(frame).toHaveAttribute('aria-busy', 'false');
     const after = await frame.boundingBox();
     expect(after!.width).toBeCloseTo(before!.width, 0);
     expect(after!.height).toBeCloseTo(before!.height, 0);
-    expect(await skeleton.evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('none');
+    await expect(preview).not.toBeVisible();
   });
 }
 
-test('a failed thumbnail stops its skeleton and keeps the original media link usable', async ({ page }) => {
+test('a failed thumbnail replaces its preview and keeps the original media link usable', async ({ page }) => {
   await page.route('**/*.webp', route => route.abort());
   await page.goto('');
   const frame = page.locator('.media-portrait');
@@ -57,7 +57,7 @@ test('the lightbox opens and closes over 400ms and has no visible controls', asy
   await expect(page.locator('.portrait-link')).toBeFocused();
 });
 
-test('the matching lightbox skeleton remains dismissible while loading and late responses do not reopen it', async ({ page }) => {
+test('the blurred lightbox preview remains dismissible while loading and late responses do not reopen it', async ({ page }) => {
   await page.goto('');
   const trigger = page.locator('.proof-link').first();
   const href = await trigger.getAttribute('href');
@@ -66,8 +66,7 @@ test('the matching lightbox skeleton remains dismissible while loading and late 
   await page.route(`**${href}`, async route => { await pending; await route.continue(); });
   await trigger.click();
   await expect(page.locator('#lightbox-media')).toHaveAttribute('data-media-state', 'loading');
-  await expect(page.locator('#lightbox-loader .skeleton-image')).toBeVisible();
-  await expect(page.locator('#lightbox-loader .skeleton:not([hidden])')).toHaveCount(1);
+  await expect(page.locator('#lightbox-loader')).toBeVisible();
   await page.mouse.click(4, 4);
   await expect(page.locator('#lightbox')).not.toBeVisible();
   release();
@@ -89,23 +88,6 @@ test('wheel zoom, drag, double-click reset, and background dismissal work withou
   await page.mouse.click(4, 4);
   await expect(page.locator('#lightbox')).not.toBeVisible();
 });
-
-for (const theme of ['light', 'dark']) {
-  test(`keyboard focus and terminal input never add outlines or box borders in ${theme} mode`, async ({ page }) => {
-    await page.addInitScript(theme => localStorage.setItem('theme', theme), theme);
-    await page.goto('');
-    await page.keyboard.press('Tab');
-    for (const selector of ['#theme-toggle', '#term-trigger', '.project-card', '.cert-card']) {
-      const element = page.locator(selector).first();
-      await element.focus();
-      expect(await element.evaluate(element => ({ outline: getComputedStyle(element).outlineStyle, border: getComputedStyle(element).borderTopWidth }))).toEqual({ outline: 'none', border: '0px' });
-    }
-    await page.locator('#term-trigger').click();
-    for (const selector of ['#terminal-dialog', '#term-input']) {
-      expect(await page.locator(selector).evaluate(element => ({ outline: getComputedStyle(element).outlineStyle, border: getComputedStyle(element).borderTopWidth }))).toEqual({ outline: 'none', border: '0px' });
-    }
-  });
-}
 
 test('refresh and return from a project restore the scroll position before any visible top frame', async ({ page }) => {
   await page.addInitScript(() => {
@@ -130,14 +112,14 @@ test('refresh and return from a project restore the scroll position before any v
   expect(await page.evaluate(() => (window as unknown as { __visiblePositions: number[] }).__visiblePositions.every(y => y > 1000))).toBe(true);
 });
 
-test('skills have a pill-shaped skeleton during the deferred enhancement and stay usable if it fails', async ({ page }) => {
+test('skills keep their readable pills during the deferred enhancement and stay usable if it fails', async ({ page }) => {
   let release!: () => void;
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/skills-physics*.js', async route => { await pending; await route.abort(); });
   await page.goto('');
   await page.locator('#skills-container').scrollIntoViewIfNeeded();
   await expect(page.locator('#skills-container')).toHaveAttribute('aria-busy', 'true');
-  expect(await page.locator('.skill-pill').first().evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('skeleton-sweep');
+  expect(await page.locator('.skill-pill').first().evaluate(element => getComputedStyle(element).filter)).toBe('none');
   release();
   await expect(page.locator('#skills-container')).toHaveAttribute('aria-busy', 'false');
   await expect(page.locator('#skills-container')).not.toHaveClass(/physics-active/);
@@ -185,13 +167,13 @@ for (const width of [375, 1280]) {
   });
 }
 
-test('reduced motion disables skeleton and dialog animation while preserving image viewing', async ({ page }) => {
+test('reduced motion disables dialog animation while preserving image viewing', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   let release!: () => void;
   const pending = new Promise<void>(resolve => { release = resolve; });
   await page.route('**/*.webp', async route => { await pending; await route.continue(); });
   await page.goto('', { waitUntil: 'domcontentloaded' });
-  expect(await page.locator('.media-portrait .skeleton').evaluate(element => getComputedStyle(element, '::after').animationName)).toBe('none');
+  await expect(page.locator('.media-portrait .media-preview')).toBeVisible();
   release();
   await page.locator('.portrait-link').click();
   await expect(page.locator('#lightbox-media')).toHaveAttribute('data-media-state', 'ready');

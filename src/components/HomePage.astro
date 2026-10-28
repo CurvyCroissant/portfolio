@@ -29,7 +29,7 @@ const portrait = imageFor('profile/self-image.jpg');
       <h2 class="section-title" id="projects-title">{t(locale, 'sec-proj')}</h2>
       <div class="project-grid">{projects.map(project => <a href={routePath(locale, `projects/${project.slug}`)} class="project-card" data-reveal><h3>{t(locale, project.titleKey)}<Icon name="external" size={18} /></h3><p>{t(locale, project.descriptionKey)}</p></a>)}</div>
     </section>
-    <section id="skills" class="section" aria-labelledby="skills-title"><h2 class="section-title" id="skills-title">{t(locale, 'sec-skills')}</h2><ul class="skills-container" id="skills-container">{skills.filter(skill => skill.featured).map(skill => <li class="skill-pill">{skill.translation ? t(locale, skill.translation) : skill.label}</li>)}</ul></section>
+    <section id="skills" class="section" aria-labelledby="skills-title"><h2 class="section-title" id="skills-title">{t(locale, 'sec-skills')}</h2><ul class="skills-container" id="skills-container">{skills.filter(skill => skill.featured).map(skill => <li class="skill-pill">{skill.label}</li>)}</ul></section>
   </main>
   <Footer locale={locale} />
 </Layout>

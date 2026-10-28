@@ -3,11 +3,6 @@ export const locales = ["en", "id", "ja"] as const;
 export type Locale = (typeof locales)[number];
 
 export const messages = {
-  "nav-term": {
-    "id": "Terminal",
-    "ja": "ターミナル",
-    "en": "Terminal"
-  },
   "nav-theme-light": {
     "en": "Light",
     "id": "Terang",
@@ -468,11 +463,6 @@ export const messages = {
     "ja": "特性の分析結果",
     "en": "Trait Breakdowns"
   },
-  "term-intro": {
-    "id": "Ketik 'help' untuk melihat perintah.",
-    "ja": "コマンドを見るには 'help' と入力してください。",
-    "en": "Type 'help' to see available commands."
-  },
   "site-description": {
     "en": "Computer Science undergraduate and application developer. Explore my projects, experience, education, and technical skills.",
     "id": "Mahasiswa Ilmu Komputer dan pengembang aplikasi. Jelajahi proyek, pengalaman, pendidikan, dan keahlian teknis saya.",
@@ -502,11 +492,6 @@ export const messages = {
     "en": "Switch to light appearance",
     "id": "Beralih ke tampilan terang",
     "ja": "ライトモードに切り替える"
-  },
-  "open-terminal": {
-    "en": "Open terminal",
-    "id": "Buka terminal",
-    "ja": "ターミナルを開く"
   },
   "back-short": {
     "en": "Home",
@@ -577,31 +562,6 @@ export const messages = {
     "en": "Rotate image",
     "id": "Putar gambar",
     "ja": "画像を回転"
-  },
-  "terminal-title": {
-    "en": "Terminal",
-    "id": "Terminal",
-    "ja": "ターミナル"
-  },
-  "terminal-command": {
-    "en": "Terminal command",
-    "id": "Perintah terminal",
-    "ja": "ターミナルのコマンド"
-  },
-  "command-unknown": {
-    "en": "Unknown command: {command}. Type help to see available commands.",
-    "id": "Perintah tidak dikenal: {command}. Ketik help untuk melihat perintah yang tersedia.",
-    "ja": "不明なコマンド：{command}。help と入力すると利用可能なコマンドが表示されます。"
-  },
-  "terminal-updated": {
-    "en": "Command output updated.",
-    "id": "Hasil perintah diperbarui.",
-    "ja": "コマンドの出力を更新しました。"
-  },
-  "terminal-cleared": {
-    "en": "Terminal cleared.",
-    "id": "Terminal dibersihkan.",
-    "ja": "ターミナルをクリアしました。"
   },
   "copy-email": {
     "en": "Copy email address",

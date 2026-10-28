@@ -1,7 +1,6 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
-import Skeleton from './Skeleton.astro';
 import { t, type Locale } from '../lib/i18n';
 interface Props {
   source: ImageMetadata;
@@ -16,9 +15,10 @@ interface Props {
   eager?: boolean;
 }
 const { source, locale, portrait = false, alt, width, height, widths, sizes, position = 'center', eager = false } = Astro.props;
+const preview = await getImage({ src: source, width: 32, format: 'webp', quality: 30 });
 ---
 <span class:list={['media-frame', { 'media-portrait': portrait }]} data-media-state="loading" aria-busy="true" style={`--media-ratio:${width}/${height}`}>
-  <Skeleton />
+  <img class="media-preview" loading={eager ? 'eager' : 'lazy'} decoding="async" src={preview.src} alt="" aria-hidden="true" width={width} height={height} />
   <Image src={source} alt={alt} width={width} height={height} widths={widths} sizes={sizes} format="webp" fit="cover" position={position} loading={eager ? 'eager' : 'lazy'} fetchpriority={eager ? 'high' : undefined} decoding="async" />
   <span class="media-error">{t(locale, 'image-error')}</span>
 </span>

@@ -6,7 +6,7 @@
   try { theme = localStorage.getItem('theme'); } catch {}
   const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
   root.dataset.theme = dark ? 'dark' : 'light';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#0a0a0a' : '#fafafa');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#282b36' : '#f0eee8');
 
   const cache = new Map();
   const storage = key => { try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; } };
@@ -45,7 +45,7 @@
   const settleMedia = (image, failed = false) => {
     if (!(image instanceof HTMLImageElement)) return;
     const frame = image.closest('.media-frame');
-    if (!frame) return;
+    if (!frame || image.classList.contains('media-preview')) return;
     const finish = error => {
       if (!image.isConnected) return;
       frame.dataset.mediaState = error ? 'error' : 'ready';
@@ -65,7 +65,7 @@
       container.replaceChildren(...pills);
       container.dataset.shuffled = '';
     }
-    document.querySelectorAll('.media-frame img').forEach(image => {
+    document.querySelectorAll('.media-frame img:not(.media-preview)').forEach(image => {
       if (image.complete) settleMedia(image, !image.naturalWidth);
     });
   };
@@ -105,7 +105,6 @@
     if (event.persisted) {
       delete root.dataset.navigating;
       root.classList.remove('restoring-scroll');
-      document.querySelector('#navigation-loader')?.setAttribute('hidden', '');
       restore(target(location.href, history.state));
     } else restoreInitial();
   });
