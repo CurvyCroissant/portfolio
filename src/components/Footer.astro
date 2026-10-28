@@ -5,7 +5,7 @@ import { t, type Locale } from '../lib/i18n';
 interface Props { locale: Locale }
 const { locale } = Astro.props;
 ---
-<footer class="main-footer" aria-label={t(locale, 'contact-title')}>
+<footer class="main-footer" id="contact" aria-label={t(locale, 'contact-title')}>
   <div class="footer-content">
     <div class="social-links">
       <div class="email-item">

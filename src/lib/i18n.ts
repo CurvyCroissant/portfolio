@@ -10,7 +10,7 @@ export function t(locale: Locale, key: MessageKey, values: Record<string, string
   return messages[key][locale].replace(/\{(\w+)\}/g, (_match, name: string) => {
     const value = variables[name];
     if (value === undefined) throw new Error(`Missing ${name} in translation ${key}`);
-    return typeof value === 'number' ? new Intl.NumberFormat(locale).format(value) : value;
+    return typeof value === 'number' ? new Intl.NumberFormat(locale, name === 'gpa' ? { minimumFractionDigits: 2, maximumFractionDigits: 2 } : {}).format(value) : value;
   });
 }
 

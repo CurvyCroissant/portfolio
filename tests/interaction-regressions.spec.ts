@@ -43,16 +43,16 @@ test('a failed thumbnail replaces its preview and keeps the original media link 
   await expect(page.locator('#lightbox')).not.toBeVisible();
 });
 
-test('the lightbox opens and closes over 400ms and has no visible controls', async ({ page }) => {
+test('the lightbox opens and closes over 700ms and has no visible controls', async ({ page }) => {
   await page.goto('');
   await page.locator('.portrait-link').click();
   const media = page.locator('#lightbox-media');
-  expect(await media.evaluate(element => element.getAnimations().map(animation => animation.effect?.getTiming().duration))).toContain(400);
+  expect(await media.evaluate(element => element.getAnimations().map(animation => animation.effect?.getTiming().duration))).toContain(700);
   await expect(media).toHaveAttribute('data-media-state', 'ready');
   await expect(page.locator('#lightbox button, #lightbox a, #lightbox output')).toHaveCount(0);
   await page.keyboard.press('Escape');
   await expect(page.locator('#lightbox')).toHaveAttribute('data-closing', '');
-  expect(await media.evaluate(element => element.getAnimations().some(animation => animation.effect?.getTiming().duration === 400))).toBe(true);
+  expect(await media.evaluate(element => element.getAnimations().some(animation => animation.effect?.getTiming().duration === 700))).toBe(true);
   await expect(page.locator('#lightbox')).not.toBeVisible();
   await expect(page.locator('.portrait-link')).toBeFocused();
 });

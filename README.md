@@ -1,6 +1,6 @@
 # Aaron Nathanael — Portfolio
 
-A static, frontend-only portfolio built with Astro, TypeScript, and CSS. The design uses system fonts, a monochrome palette, rounded surfaces, and light/dark appearance.
+A static, frontend-only portfolio built with Astro, TypeScript, and CSS. The Liquid Glass design uses floating, luminous controls over pastel ambient fields and quieter content materials, with system typography and coordinated light/dark appearances.
 
 ## Languages and navigation
 
@@ -20,13 +20,18 @@ Language links preserve the current project. Each page includes localized titles
 - Local images are processed at build time into responsive WebP thumbnails. The portrait loads eagerly with high priority; gallery thumbnails load lazily. Full-resolution originals are requested when opened, and remain available through normal image links without JavaScript.
 - JavaScript is bundled, minified, and given hashed filenames. Fonts and scripts require no third-party CDN requests.
 - Appearance follows the system until a manual light/dark choice is saved. Storage failures do not prevent the site from working. The browser theme color follows the selected appearance.
-- The image viewer shows only the media over a dimmed backdrop. It supports wheel/pinch zoom, drag-to-pan, double-click zoom/reset, and keyboard `+`, `-`, and `0`. Certificates with stored rotation are fitted to the full viewport. Opening and closing animate to/from the source over 400 ms; page reveals use 900 ms and surface transitions use 600 ms.
+- The image viewer shows only the media over a dimmed, blurred backdrop. It supports wheel/pinch zoom, drag-to-pan, double-click zoom/reset, and keyboard `+`, `-`, and `0`. Certificates with stored rotation are fitted to the full viewport. Opening and closing animate to/from the source over 700 ms; page transitions use 900 ms, reveals 1000 ms, material colors 800 ms, and hover/press release 620 ms. Scripted motion reads the same CSS tokens, including production CSS time-unit normalization.
 - Scroll positions are saved per page and per history entry, including a content anchor for layout changes. Back, Forward, refresh, Home, and revisiting a page restore the saved location before content becomes visible. Storage failure falls back to memory for same-tab navigation.
 - Each mounted page owns its listeners, observers, animations, and physics. Navigation disposes them before mounting the next page.
 - Skills shuffle on each page initialization. Dragging prevents native text selection, including on WebKit. Dark mode uses diffuse ambient elevation shadows without outline rings.
 - The entire footer email row copies the address to the clipboard and announces localized feedback. It has a mail icon and no separate copy icon or mailto action. Repository links reuse the footer’s GitHub icon.
 - Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes neighbouring pills; small physics steps and a bounded spring prevent cursor jumps from tunnelling through them. The animation loop stops when pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Pills capture touch drags; the surrounding space retains vertical page scrolling.
 - Reduced motion disables decorative reveals, transitions, and physics. Content is never hidden while waiting for animation code.
+- Native View Transitions blend the old and incoming viewports while preserving fixed navigation. Older browsers use a content-only spatial fallback. Both paths cancel safely, respect reduced motion and preserve history and scroll restoration.
+- Hover light follows the pointer, and touch press feedback releases smoothly. Language menus materialize from their trigger and reverse their current animation when interrupted; closed/closing panels stay inert. Selection/focus outlines are absent; keyboard focus uses material, elevation and underlined labels.
+- Reduced transparency/increased contrast preferences and browsers without backdrop filtering receive solid, legible material fallbacks. Pointer lighting schedules work only on input and stays idle at rest.
+
+The material hierarchy follows [Apple’s Materials guidance](https://developer.apple.com/design/human-interface-guidelines/materials) and [Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/), implemented with web-native CSS and progressive enhancement.
 
 ## Development
 

@@ -1,6 +1,6 @@
 /** CSS owns the shared motion timings; scripted interactions use the same values. */
 export const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
-export function motionDuration(name: 'dialog' | 'reveal' | 'zoom'): number {
+export function motionDuration(name: 'dialog' | 'reveal' | 'zoom' | 'menu' | 'page' | 'text' | 'color'): number {
   if (reducedMotion.matches) return 0;
   const value = getComputedStyle(document.documentElement).getPropertyValue(`--motion-${name}`).trim();
   // Production CSS may normalize 400ms to .4s.

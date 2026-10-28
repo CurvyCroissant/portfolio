@@ -7,7 +7,7 @@ export const site = {
   email: 'aaronnathanaelishakleman@gmail.com',
   github: 'https://github.com/CurvyCroissant',
   linkedin: 'https://www.linkedin.com/in/aaron-nathanael',
-  facts: { gpa: 3.92, sicParticipants: 1898, sicSemiFinalists: 80 },
+  facts: { gpa: 3.90, sicParticipants: 1898, sicSemiFinalists: 80 },
 } as const;
 
 export interface TimelineEntry {

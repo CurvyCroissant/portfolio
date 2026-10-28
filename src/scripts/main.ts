@@ -3,6 +3,7 @@ import { readStorage, writeStorage } from './preferences';
 import { PageScope } from './lifecycle';
 import { setupNavigation } from './navigation';
 import { motionDuration, motionEase } from './motion';
+import { setupGlass } from './glass';
 
 function setupTheme(copy: ClientCopy, scope: PageScope) {
   const button = document.querySelector<HTMLButtonElement>('#theme-toggle');
@@ -11,7 +12,7 @@ function setupTheme(copy: ClientCopy, scope: PageScope) {
   const system = matchMedia('(prefers-color-scheme: dark)');
   const apply = (dark: boolean) => {
     document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#282b36' : '#f0eee8');
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#252c3d' : '#eaf0f5');
     const text = copy[dark ? 'nav-theme-light' : 'nav-theme-dark'];
     if (label.textContent !== text) {
       const node = label.querySelector('.translation-text')?.firstChild ?? label.firstChild;
@@ -35,7 +36,7 @@ function setupTheme(copy: ClientCopy, scope: PageScope) {
     });
     apply(dark);
     clearTimeout(themeTimer);
-    themeTimer = setTimeout(resetThemeDelays, 1200);
+    themeTimer = setTimeout(resetThemeDelays, motionDuration('color') + 7 * 65 + 80);
   });
   scope.on(system, 'change', () => {
     const saved = readStorage('localStorage', 'theme');
@@ -46,37 +47,55 @@ function setupTheme(copy: ClientCopy, scope: PageScope) {
 
 function setupLanguages(scope: PageScope) {
   const details = document.querySelector<HTMLDetailsElement>('#lang-dropdown');
-  if (!details) return;
-  let hovered = false;
-  let restoringFocus = false;
-  const toggle = details.querySelector<HTMLElement>('summary');
-  const panel = details.querySelector<HTMLElement>('.lang-menu');
-  const sync = () => { if (panel) panel.inert = !details.open; };
-  sync();
-  const close = (restoreFocus = false) => {
+  const toggle = details?.querySelector<HTMLElement>('summary');
+  const panel = details?.querySelector<HTMLElement>('.lang-menu');
+  if (!details || !toggle || !panel) return;
+  let hovered = false, restoringFocus = false;
+  let animation: Animation | undefined;
+  let revision = 0;
+  panel.inert = !details.open;
+  const present = (opening: boolean, restoreFocus = false) => {
     if (restoreFocus) {
-      restoringFocus = true;
-      toggle?.focus({ preventScroll: true });
-      restoringFocus = false;
+      restoringFocus = true; toggle.focus({ preventScroll: true }); restoringFocus = false;
     }
-    details.open = false; hovered = false; sync();
+    if (opening && details.open && details.dataset.menuState === 'open') return;
+    if (!opening && (!details.open || details.dataset.menuState === 'closing')) return;
+    const ticket = ++revision;
+    const visible = details.open;
+    const style = visible ? getComputedStyle(panel) : null;
+    const from = { opacity: visible ? style!.opacity : '0', transform: visible ? style!.transform : 'translateY(-10px) scale(.92)' };
+    animation?.cancel();
+    details.dataset.menuState = opening ? 'open' : 'closing';
+    details.open = true;
+    panel.inert = !opening;
+    const finish = () => {
+      if (ticket !== revision) return;
+      animation?.cancel(); animation = undefined;
+      if (!opening) { details.open = false; delete details.dataset.menuState; }
+    };
+    const duration = motionDuration('menu');
+    if (!duration) { finish(); return; }
+    animation = panel.animate([from, { opacity: opening ? 1 : 0, transform: opening ? 'translateY(0) scale(1)' : 'translateY(-8px) scale(.94)' }], { duration, easing: motionEase(), fill: 'both' });
+    void animation.finished.then(finish, () => {});
   };
-  scope.on(details, 'toggle', sync);
-  scope.on(details, 'focusin', event => {
-    if (!restoringFocus && event.target === toggle && toggle?.matches(':focus-visible')) { details.open = true; sync(); }
-  });
-  scope.on(details, 'focusout', event => {
-    if (event.relatedTarget instanceof Node && !details.contains(event.relatedTarget)) close();
-  });
-  scope.on(details, 'pointerenter', event => { if (event.pointerType === 'mouse') { hovered = true; details.open = true; sync(); } });
-  scope.on(details, 'pointerleave', event => { if (event.pointerType === 'mouse') close(panel?.contains(document.activeElement)); });
+  const close = (restoreFocus = false) => { hovered = false; present(false, restoreFocus); };
+  scope.on(details, 'toggle', () => { panel.inert = !details.open || details.dataset.menuState === 'closing'; });
+  scope.on(details, 'focusin', event => { if (!restoringFocus && event.target === toggle && toggle.matches(':focus-visible')) present(true); });
+  scope.on(details, 'focusout', event => { if (event.relatedTarget instanceof Node && !details.contains(event.relatedTarget)) close(); });
+  scope.on(details, 'pointerenter', event => { if (event.pointerType === 'mouse') { hovered = true; present(true); } });
+  scope.on(details, 'pointerleave', event => { if (event.pointerType === 'mouse') close(panel.contains(document.activeElement)); });
   scope.on(details, 'pointerdown', event => { if (event.pointerType === 'touch') hovered = false; });
-  scope.on(toggle, 'click', event => { if (hovered && event.detail > 0) event.preventDefault(); });
+  scope.on(toggle, 'click', event => {
+    event.preventDefault();
+    if (hovered && event.detail > 0) present(true);
+    else if (details.open && details.dataset.menuState !== 'closing') close();
+    else present(true);
+  });
   scope.on(details, 'keydown', event => {
     if ((event.key === 'ArrowDown' || event.key === 'ArrowUp') && event.target === toggle) {
-      event.preventDefault(); details.open = true; sync();
-      const options = panel?.querySelectorAll<HTMLElement>('a[href]');
-      (event.key === 'ArrowDown' ? options?.[0] : options?.[options.length - 1])?.focus();
+      event.preventDefault(); present(true);
+      const options = panel.querySelectorAll<HTMLElement>('a[href]');
+      (event.key === 'ArrowDown' ? options[0] : options[options.length - 1])?.focus();
     }
   });
   scope.on(details, 'click', event => { if ((event.target as Element).closest('a')) close(true); });
@@ -84,9 +103,9 @@ function setupLanguages(scope: PageScope) {
   scope.on(document, 'portfolio:before-navigation' as keyof DocumentEventMap, () => close());
   scope.on(window, 'blur', () => close());
   scope.on(document, 'visibilitychange', () => { if (document.hidden) close(); });
-  scope.on(document, 'keydown', event => {
-    if (event.key === 'Escape' && details.open) { event.preventDefault(); close(true); }
-  });
+  scope.on(document, 'keydown', event => { if (event.key === 'Escape' && details.open) { event.preventDefault(); close(true); } });
+  scope.on(matchMedia('(prefers-reduced-motion: reduce)'), 'change', event => { if (event.matches) animation?.finish(); });
+  scope.add(() => { revision++; animation?.cancel(); details.open = false; delete details.dataset.menuState; });
 }
 
 function setupDeferredLightbox(copy: ClientCopy, scope: PageScope) {
@@ -216,6 +235,7 @@ function initialize(): () => void {
   scope.on(document, 'portfolio:language' as keyof DocumentEventMap, event => Object.assign(copy, (event as CustomEvent).detail));
   setupTheme(copy, scope);
   setupLanguages(scope);
+  setupGlass(scope);
   setupCopy(copy, scope);
   setupDeferredLightbox(copy, scope);
   setupReveals(scope);

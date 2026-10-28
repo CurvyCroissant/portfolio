@@ -1,5 +1,5 @@
-import { reducedMotion, motionEase } from './motion';
 import { translatePage } from './text-transition';
+import { transitionPage } from './page-transition';
 export interface ScrollPosition { y: number; anchor?: string; offset?: number }
 export interface PageState { portfolioEntry?: string; [key: string]: unknown }
 interface ScrollMemory {
@@ -23,8 +23,6 @@ export function setupNavigation(mount: () => (() => void)) {
   let currentState: PageState = history.state;
   let active: AbortController | undefined;
   let sequence = 0;
-  let pageAnimation: Animation | undefined;
-  const cancelPageAnimation = () => { pageAnimation?.cancel(); pageAnimation = undefined; };
   const assetSignature = (page: Document) => [...page.querySelectorAll<HTMLLinkElement | HTMLScriptElement>('link[rel="stylesheet"], script[type="module"][src]')].map(element => element.getAttribute(element.tagName === 'LINK' ? 'href' : 'src')).sort().join('|');
   // The executed script may be removed with the old body; retain its version.
   const loadedAssets = assetSignature(document);
@@ -33,7 +31,6 @@ export function setupNavigation(mount: () => (() => void)) {
   const clearLoading = () => { delete root.dataset.navigating; document.querySelector('main')?.removeAttribute('aria-busy'); };
   const navigate = async (url: URL, traverse = false, carriedPosition?: ScrollPosition) => {
     active?.abort();
-    cancelPageAnimation();
     const controller = new AbortController();
     active = controller;
     const serial = ++sequence;
@@ -93,35 +90,26 @@ export function setupNavigation(mount: () => (() => void)) {
         if (controller.signal.aborted) return;
         clearLoading(); memory.save(); return;
       }
-      const oldBody = document.body;
       const direction = url.pathname.length < currentURL.pathname.length ? -1 : 1;
-      if (!reducedMotion.matches) {
-        pageAnimation = oldBody.animate([{ transform: 'translateX(0)', opacity: 1 }, { transform: `translateX(${-direction * 6}vw)`, opacity: 0 }], { duration: 250, easing: 'ease-in', fill: 'forwards' });
-        controller.signal.addEventListener('abort', cancelPageAnimation, { once: true });
-        await pageAnimation.finished.catch(() => {});
-      }
-      if (controller.signal.aborted) { oldBody.getAnimations().forEach(a => a.cancel()); return; }
-      cancelPageAnimation();
-      dispose(); updateHead();
-      document.body.replaceWith(document.importNode(incoming.body, true));
-      currentURL = url;
-      currentState = history.state;
-      memory.enhance();
-      // Hidden content can be measured and positioned before its first visible frame.
-      memory.restore(position);
-      dispose = mount();
-      memory.restore(position);
+      await transitionPage(() => {
+        dispose(); updateHead();
+        document.body.replaceWith(document.importNode(incoming.body, true));
+        currentURL = url;
+        currentState = history.state;
+        memory.enhance();
+        // Hidden content can be measured and positioned before its first visible frame.
+        memory.restore(position);
+        dispose = mount();
+        memory.restore(position);
+        if (url.hash) document.getElementById(decodeURIComponent(url.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' });
+        const heading = document.querySelector<HTMLElement>('main h1');
+        if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
+      }, controller.signal, direction);
+      if (controller.signal.aborted || serial !== sequence) return;
       clearLoading();
-      if (!reducedMotion.matches) {
-        pageAnimation = document.body.animate([{ transform: `translateX(${direction * 12}vw)`, opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 650, easing: motionEase() });
-      }
-      if (url.hash) document.getElementById(decodeURIComponent(url.hash.slice(1)))?.scrollIntoView({ behavior: 'instant' });
-      const heading = document.querySelector<HTMLElement>('main h1');
-      if (heading) { heading.tabIndex = -1; heading.focus({ preventScroll: true }); }
       memory.save();
     } catch {
       if (controller.signal.aborted || serial !== sequence) return;
-      cancelPageAnimation();
       clearLoading();
       location.assign(url.href);
     }

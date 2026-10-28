@@ -1,3 +1,5 @@
+import { motionDuration } from './motion';
+
 /** Translate existing nodes so media, scroll containers and enhancements retain identity. */
 export async function translatePage(incoming: Document, signal: AbortSignal, commit: () => void) {
   const collect = (doc: Document) => {
@@ -21,7 +23,7 @@ export async function translatePage(incoming: Document, signal: AbortSignal, com
   const containers = [...document.querySelectorAll<HTMLElement>('main > section, .list-item, .cert-card, .project-card, .main-footer, .control, .project-content-grid, .content-block, .project-meta, .cert-info, .social-links')];
   const held = containers.map(el => ({ el, height: el.style.height, overflow: el.style.overflow, bounds: el.getBoundingClientRect() }));
   const animations: Animation[] = [];
-  const duration = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 425;
+  const duration = motionDuration('text') / 2;
   const run = async (enter: boolean) => {
     for (const target of targets) {
       const rect = target.span.getBoundingClientRect();

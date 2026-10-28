@@ -65,7 +65,7 @@ export function setupLightbox(copy: ClientCopy, scope: PageScope) {
     dialog.dataset.closing = '';
     const duration = motionDuration('dialog');
     if (duration) {
-      animation = media.animate([{ transform: currentTransform, opacity: 1, borderRadius: getComputedStyle(media).borderRadius }, { transform: originTransform(), opacity: 0, borderRadius: opener?.dataset.mediaKind === 'portrait' ? '50%' : '12px' }], { duration, easing: motionEase(), fill: 'forwards' });
+      animation = media.animate([{ transform: currentTransform, opacity: 1, borderRadius: getComputedStyle(media).borderRadius }, { transform: originTransform(), opacity: 0, borderRadius: opener?.dataset.mediaKind === 'portrait' ? '50%' : '24px' }], { duration, easing: motionEase(), fill: 'forwards' });
       await animation.finished.catch(() => {});
     }
     if (dialog.open) dialog.close();
@@ -106,12 +106,12 @@ export function setupLightbox(copy: ClientCopy, scope: PageScope) {
     image.hidden = true;
     media.dataset.mediaState = 'loading'; media.setAttribute('aria-busy', 'true');
     media.style.transition = 'none';
-    media.style.borderRadius = '12px';
+    media.style.borderRadius = '24px';
     status.textContent = copy['image-loading'];
     dialog.showModal(); updateScrollLock();
     fitImage();
     const duration = motionDuration('dialog');
-    if (duration) animation = media.animate([{ transform: originTransform(), opacity: .5, borderRadius: trigger.dataset.mediaKind === 'portrait' ? '50%' : '12px' }, { transform: transform(), opacity: 1, borderRadius: '12px' }], { duration, easing: motionEase() });
+    if (duration) animation = media.animate([{ transform: originTransform(), opacity: .5, borderRadius: trigger.dataset.mediaKind === 'portrait' ? '50%' : '24px' }, { transform: transform(), opacity: 1, borderRadius: '24px' }], { duration, easing: motionEase() });
     const fail = () => {
       if (request !== currentRequest || !dialog.open || closing) return;
       status.textContent = copy['image-error'];
@@ -136,7 +136,7 @@ export function setupLightbox(copy: ClientCopy, scope: PageScope) {
   const setZoom = (value: number, x = 0, y = 0, smooth = true) => {
     if (image.hidden || closing) return;
     stopAnimation();
-    media.style.transition = smooth ? `transform ${motionDuration('zoom')}ms ease-out` : 'none';
+    media.style.transition = smooth ? `transform ${motionDuration('zoom')}ms ${motionEase()}` : 'none';
     const next = clamp(value, 1, 4), ratio = next / zoom;
     panX = x - (x - panX) * ratio; panY = y - (y - panY) * ratio;
     zoom = next;

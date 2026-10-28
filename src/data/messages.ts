@@ -99,9 +99,9 @@ export const messages = {
     "en": "Aaron Nathanael"
   },
   "hero-desc": {
-    "id": "Mahasiswa S1 Ilmu Komputer tahun keempat di BINUS University. Saat ini sedang magang sebagai Pengembang Aplikasi di PT Bank Central Asia Tbk. Aktif mempelajari penerapan teknologi dalam situasi bisnis nyata.",
-    "ja": "ビヌス大学でコンピュータサイエンスを学ぶ学部4年生です。現在、PT Bank Central Asia Tbkでアプリケーション開発のインターンとして勤務しています。実際のビジネスの現場で技術がどのように活用されるかを積極的に学んでいます。",
-    "en": "4th-year Computer Science undergraduate at BINUS University. Currently interning as an Application Developer at PT Bank Central Asia Tbk. Actively learning ways tech is implemented in real-world business scenarios."
+    "id": "Mahasiswa S1 Ilmu Komputer di BINUS University | Magang Pengembang Aplikasi di PT Bank Central Asia Tbk.",
+    "ja": "ビヌス大学 コンピュータサイエンス学部生 | PT Bank Central Asia Tbk アプリケーション開発インターン。",
+    "en": "Computer Science Undergraduate @ BINUS University | Application Developer Intern @ PT Bank Central Asia Tbk."
   },
   "exp-bca": {
     "id": "Magang Pengembang Aplikasi",
@@ -189,9 +189,9 @@ export const messages = {
     "en": "Bachelor of Computer Science"
   },
   "edu-binus-desc": {
-    "id": "Mahasiswa S1 Ilmu Komputer dengan IPK kumulatif {gpa}. Mengikuti Global Class Program, yang menyediakan seluruh materi dalam bahasa Inggris serta satu semester pertukaran pelajar internasional. Saat ini mendalami pengembangan aplikasi iOS, pengembangan web full-stack, dan pembelajaran mesin.",
-    "ja": "累積GPA {gpa}のコンピュータサイエンス学部生です。すべての学習資料が英語で提供され、1学期間の国際交換留学も含まれるグローバルクラスプログラムに在籍しています。現在はiOSアプリ開発、フルスタックのウェブ開発、機械学習の学習に取り組んでいます。",
-    "en": "Computer Science undergraduate with a cumulative GPA of {gpa}. In the Global Class Program, meaning that all the material is provided in English, along with one semester of International Study Exchange. Currently pursuing iOS App Development, Full-Stack Web Development, and Machine Learning."
+    "id": "Mahasiswa S1 Ilmu Komputer tahun keempat dengan IPK kumulatif {gpa}. Mengikuti program Global Class, dengan seluruh materi dan perkuliahan disampaikan sepenuhnya dalam bahasa Inggris serta pertukaran pelajar internasional wajib selama satu semester.",
+    "ja": "累積GPA {gpa}のコンピュータサイエンス学部4年生です。教材も講義もすべて英語で提供され、1学期間の国際交換留学が必修となるグローバルクラスプログラムに在籍しています。",
+    "en": "4th-year Computer Science undergraduate with a cumulative GPA of {gpa}. Within the Global Class program, where all the materials and lectures are provided entirely in English, as well as a compulsory international study exchange for one semester."
   },
   "edu-smak-sub": {
     "id": "Ijazah SMA",
