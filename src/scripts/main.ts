@@ -1,49 +1,9 @@
 import type { ClientCopy } from '../lib/i18n';
-import { readStorage, writeStorage } from './preferences';
 import { PageScope } from './lifecycle';
 import { setupNavigation } from './navigation';
 import { motionDuration, motionEase } from './motion';
 import { setupGlass } from './glass';
-
-function setupTheme(copy: ClientCopy, scope: PageScope) {
-  const button = document.querySelector<HTMLButtonElement>('#theme-toggle');
-  const label = document.querySelector('#theme-label');
-  if (!button || !label) return;
-  const system = matchMedia('(prefers-color-scheme: dark)');
-  const apply = (dark: boolean) => {
-    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
-    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#252c3d' : '#eaf0f5');
-    const text = copy[dark ? 'nav-theme-light' : 'nav-theme-dark'];
-    if (label.textContent !== text) {
-      const node = label.querySelector('.translation-text')?.firstChild ?? label.firstChild;
-      if (node?.nodeType === Node.TEXT_NODE) node.textContent = text;
-      else label.textContent = text;
-    }
-    label.setAttribute('data-measure', copy['nav-theme-light']);
-    button.setAttribute('aria-label', copy[dark ? 'theme-to-light' : 'theme-to-dark']);
-  };
-  let themeTimer: ReturnType<typeof setTimeout>;
-  const resetThemeDelays = () => document.querySelectorAll<HTMLElement>('[style*="--theme-delay"]').forEach(element => element.style.removeProperty('--theme-delay'));
-  scope.add(() => { clearTimeout(themeTimer); resetThemeDelays(); });
-  apply(document.documentElement.dataset.theme === 'dark');
-  scope.on(document, 'portfolio:language' as keyof DocumentEventMap, () => apply(document.documentElement.dataset.theme === 'dark'));
-  scope.on(button, 'click', () => {
-    const dark = document.documentElement.dataset.theme !== 'dark';
-    writeStorage('localStorage', 'theme', dark ? 'dark' : 'light');
-    document.querySelectorAll<HTMLElement>('body, body *').forEach(element => {
-      let depth = 0; for (let node = element.parentElement; node && node !== document.body; node = node.parentElement) depth++;
-      element.style.setProperty('--theme-delay', `${Math.min(depth, 7) * 65}ms`);
-    });
-    apply(dark);
-    clearTimeout(themeTimer);
-    themeTimer = setTimeout(resetThemeDelays, motionDuration('color') + 7 * 65 + 80);
-  });
-  scope.on(system, 'change', () => {
-    const saved = readStorage('localStorage', 'theme');
-    if (saved !== 'light' && saved !== 'dark') apply(system.matches);
-  });
-  button.hidden = false;
-}
+import { setupTheme } from './theme';
 
 function setupLanguages(scope: PageScope) {
   const details = document.querySelector<HTMLDetailsElement>('#lang-dropdown');
@@ -175,9 +135,11 @@ function setupReveals(scope: PageScope) {
     for (const entry of entries) {
       if (!entry.isIntersecting) continue;
       observer.unobserve(entry.target);
+      if (!entry.target.hasAttribute('data-reveal-pending')) continue;
       entry.target.removeAttribute('data-reveal-pending');
-      if (reduced.matches) continue;
+      if (reduced.matches || document.documentElement.hasAttribute('data-language-layout')) continue;
       const animation = entry.target.animate([{ opacity: 0, transform: 'translateY(30px)' }, { opacity: 1, transform: 'none' }], { duration: motionDuration('reveal'), easing: motionEase() });
+      animation.id = 'portfolio-reveal';
       animations.add(animation);
       animation.finished.then(() => animations.delete(animation)).catch(() => animations.delete(animation));
     }

@@ -14,9 +14,9 @@ export const messages = {
     "ja": "ダーク"
   },
   "back-home": {
-    "id": "← Kembali ke Beranda",
-    "ja": "← ホームに戻る",
-    "en": "← Back to Home"
+    "id": "← Kembali",
+    "ja": "← 戻る",
+    "en": "← Back"
   },
   "view-cert": {
     "id": "Lihat Sertifikat",
@@ -494,9 +494,9 @@ export const messages = {
     "ja": "ライトモードに切り替える"
   },
   "back-short": {
-    "en": "Home",
-    "id": "Beranda",
-    "ja": "ホーム"
+    "en": "Back",
+    "id": "Kembali",
+    "ja": "戻る"
   },
   "present": {
     "en": "Present",

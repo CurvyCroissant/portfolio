@@ -1,6 +1,6 @@
 # Aaron Nathanael — Portfolio
 
-A static, frontend-only portfolio built with Astro, TypeScript, and CSS. The Liquid Glass design uses floating, luminous controls over pastel ambient fields and quieter content materials, with system typography and coordinated light/dark appearances.
+A static, frontend-only portfolio built with Astro, TypeScript, and CSS. The Liquid Glass design uses floating, luminous controls over monochrome ambient fields and quieter content materials, with system typography and coordinated light/dark appearances.
 
 ## Languages and navigation
 
@@ -28,7 +28,7 @@ Language links preserve the current project. Each page includes localized titles
 - Skills remain a readable static list first. Matter.js loads only near that section, when reduced motion is off. Dragging wakes neighbouring pills; small physics steps and a bounded spring prevent cursor jumps from tunnelling through them. The animation loop stops when pills sleep, leave the viewport, or the page is hidden. The layout rebuilds on width changes. Pills capture touch drags; the surrounding space retains vertical page scrolling.
 - Reduced motion disables decorative reveals, transitions, and physics. Content is never hidden while waiting for animation code.
 - Native View Transitions blend the old and incoming viewports while preserving fixed navigation. Older browsers use a content-only spatial fallback. Both paths cancel safely, respect reduced motion and preserve history and scroll restoration.
-- Hover light follows the pointer, and touch press feedback releases smoothly. Language menus materialize from their trigger and reverse their current animation when interrupted; closed/closing panels stay inert. Selection/focus outlines are absent; keyboard focus uses material, elevation and underlined labels.
+- Cursor light follows the pointer across the background and nested content materials, and touch press feedback releases smoothly. Language menus materialize from their trigger and reverse their current animation when interrupted; closed/closing panels stay inert. Selection/focus outlines are absent; keyboard focus uses material, elevation and movement without underlines or rings.
 - Reduced transparency/increased contrast preferences and browsers without backdrop filtering receive solid, legible material fallbacks. Pointer lighting schedules work only on input and stays idle at rest.
 
 The material hierarchy follows [Apple’s Materials guidance](https://developer.apple.com/design/human-interface-guidelines/materials) and [Meet Liquid Glass](https://developer.apple.com/videos/play/wwdc2025/219/), implemented with web-native CSS and progressive enhancement.
@@ -87,9 +87,9 @@ The automated suite uses Chromium. Real iOS Safari testing remains useful for vi
 ## Interaction and performance
 
 - Hoverable native language dropdown with tap, keyboard and Escape support.
-- In-place English/Indonesian/Japanese text wipes retain DOM nodes, exact scroll and gallery state. Technical Skills remain English.
-- Pastel light/slate dark palettes transition from outer surfaces toward inner content.
+- In-place English/Indonesian/Japanese text wipes retain DOM nodes and gallery state; vertical positions, heights and label widths resize together, and shorter pages clamp to their natural bottom. Technical Skills remain English.
+- Monochrome light/dark palettes transition through exactly three sequential groups: background, surfaces, then all text/icons.
 - Spatial page transitions; horizontal-only gallery overflow preserves vertical page gestures.
 - Tiny blurred image previews, eager hero image, lazy lower-page images, on-intent viewer module and near-viewport physics.
-- Contact rows share equal vertical dimensions across responsive layouts.
+- Contact icon/text groups are centered in equal-height rows across responsive layouts. Root overscroll is disabled while native document scrolling remains available.
 - See AGENTS.md for the maintained project requirements.

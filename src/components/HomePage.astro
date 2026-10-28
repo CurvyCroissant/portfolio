@@ -18,7 +18,6 @@ const portrait = imageFor('profile/self-image.jpg');
     <section class="hero" aria-labelledby="hero-title">
       <a href={portrait.src} class="portrait-link" data-lightbox data-media-kind="portrait" data-media-width={portrait.width} data-media-height={portrait.height} data-title={t(locale, 'portrait-title')} aria-label={t(locale, 'open-image', { title: t(locale, 'portrait-title') })}><Media source={portrait} locale={locale} portrait alt={t(locale, 'portrait-title')} width={640} height={640} widths={[240, 320, 480, 640]} sizes="(max-width: 424px) 66vw, 280px" eager /></a>
       <h1 id="hero-title">{t(locale, 'my-name')}</h1><p>{t(locale, 'hero-desc')}</p>
-      <div class="hero-actions"><a class="control primary-action" href="#projects">{t(locale, 'sec-proj')}<Icon name="external" size={17} /></a><a class="control" href="#contact">{t(locale, 'contact-title')}<Icon name="mail" size={17} /></a></div>
     </section>
     <section id="education" class="section" aria-labelledby="education-title"><h2 class="section-title" id="education-title">{t(locale, 'sec-edu')}</h2><Timeline locale={locale} entries={education} /></section>
     <section id="experience" class="section" aria-labelledby="experience-title"><h2 class="section-title" id="experience-title">{t(locale, 'sec-exp')}</h2><Timeline locale={locale} entries={experience} /></section>

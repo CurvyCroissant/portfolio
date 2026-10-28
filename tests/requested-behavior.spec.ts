@@ -21,7 +21,9 @@ test('language wipes preserve media, physics, and horizontal carousel positions'
     const saved = window as unknown as { __portrait: Element; __skills: Element };
     return { identity: saved.__portrait === document.querySelector('.media-portrait') && saved.__skills === document.querySelector('#skills-container'), y: scrollY, x: document.querySelector('.cert-grid')!.scrollLeft, pills: [...document.querySelectorAll('.skill-pill')].map(el => el.textContent), wrappers: document.querySelectorAll('.translation-text').length };
   });
-  expect(after).toEqual({ ...before, identity: true, wrappers: 0 });
+  const maximum = await page.evaluate(() => Math.max(0, document.documentElement.scrollHeight - innerHeight));
+  expect(after).toEqual({ ...before, y: Math.min(before.y, maximum), identity: true, wrappers: 0 });
+  expect(await page.locator('body').evaluate(el => el.style.minHeight)).toBe('');
 });
 
 test('hover disclosure stays open on first click and closes when focus leaves', async ({ page }) => {
@@ -56,13 +58,39 @@ test('carousel vertical wheel gestures scroll the document', async ({ page }) =>
   expect(await carousel.evaluate(el => el.scrollTop)).toBe(0);
 });
 
-test('theme colors stagger outwards to inwards and remove delays afterward', async ({ page }) => {
+test('theme colors use three sequential background, surface and text phases', async ({ page }) => {
   await page.goto('');
+  const read = () => page.evaluate(() => ({
+    background: getComputedStyle(document.body).backgroundColor,
+    surface: getComputedStyle(document.querySelector('.list-item')!).backgroundColor,
+    text: getComputedStyle(document.querySelector('.hero > p')!).color,
+  }));
+  const old = await read();
   await page.locator('#theme-toggle').click();
-  const delays = await page.evaluate(() => ['body', '.skills-container', '.skill-pill'].map(selector => parseFloat(document.querySelector<HTMLElement>(selector)!.style.getPropertyValue('--theme-delay'))));
-  expect(delays[0]).toBeLessThan(delays[1]);
-  expect(delays[1]).toBeLessThan(delays[2]);
-  await expect.poll(() => page.locator('[style*="--theme-delay"]').count()).toBe(0);
+  await page.evaluate(() => {
+    const animation = document.documentElement.getAnimations().find(a => a.id === 'portfolio-theme')!;
+    animation.pause();
+    Object.assign(window, { __themeAnimation: animation });
+  });
+  const seek = async (fraction: number) => {
+    await page.evaluate(async value => {
+      const animation = (window as unknown as { __themeAnimation: Animation }).__themeAnimation;
+      animation.currentTime = Number(animation.effect!.getTiming().duration) * value;
+      await new Promise(requestAnimationFrame);
+    }, fraction);
+    return read();
+  };
+  const background = await seek(1 / 6);
+  expect(background.background).not.toBe(old.background);
+  expect(background.surface).toBe(old.surface); expect(background.text).toBe(old.text);
+  const surface = await seek(1 / 2);
+  expect(surface.surface).not.toBe(old.surface); expect(surface.text).toBe(old.text);
+  const text = await seek(5 / 6);
+  expect(text.text).not.toBe(old.text);
+  expect(text.background).toBe(surface.background);
+  await page.evaluate(() => (window as unknown as { __themeAnimation: Animation }).__themeAnimation.finish());
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme-changing');
+  expect(await page.locator('[style*="--theme-delay"]').count()).toBe(0);
 });
 
 test('opening an image commits clicked state while the dialog is open', async ({ page }) => {
@@ -72,7 +100,7 @@ test('opening an image commits clicked state while the dialog is open', async ({
   await expect(page.locator('#lightbox')).toBeVisible();
   await expect(link).toHaveAttribute('data-clicked', '');
   await expect(link).toHaveAttribute('data-viewed', 'true');
-  await expect(link).toHaveCSS('color', 'rgb(102, 84, 125)');
+  await expect(link).toHaveCSS('color', 'rgb(91, 91, 91)');
 });
 
 test('Back during the incoming language wipe restores matching text and URL in place', async ({ page }) => {
@@ -140,25 +168,54 @@ test('critical images are eager, gallery images are lazy, and removed features s
   await expect(page.locator('dialog[open]')).toHaveCount(0);
 });
 
-test('language wipes hold section heights until the incoming text settles', async ({ page }) => {
+for (const width of [390, 1280]) {
+test(`language heights and positions share one incoming clock at ${width}px without a final jump`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 900 });
   await page.goto('');
   await page.locator('#education').scrollIntoViewIfNeeded();
+  await page.evaluate(async () => {
+    await new Promise(requestAnimationFrame);
+    document.getAnimations().forEach(a => { try { a.finish(); } catch {} });
+    document.querySelectorAll('[data-reveal-pending]').forEach(element => element.removeAttribute('data-reveal-pending'));
+    await new Promise(requestAnimationFrame);
+    document.getAnimations().forEach(a => { try { a.finish(); } catch {} });
+    const observer = new MutationObserver(() => {
+      if (document.documentElement.lang !== 'ja') return;
+      observer.disconnect();
+      const animations = document.getAnimations().filter(a => a.id.startsWith('portfolio-language-'));
+      animations.forEach(a => { a.pause(); a.currentTime = 0; });
+      Object.assign(window, { __languageAnimations: animations });
+    });
+    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  });
+  const geometry = () => page.evaluate(() => {
+    const items = document.querySelectorAll('#education .list-item');
+    const glyph = document.querySelector('.project-card h3 svg')!.getBoundingClientRect();
+    return [document.querySelector('#education')!.getBoundingClientRect().height, items[0].getBoundingClientRect().height, items[1].getBoundingClientRect().top + scrollY, glyph.left, glyph.top + scrollY];
+  });
+  const old = await geometry();
   await page.locator('#lang-toggle').click();
   await page.locator('[hreflang="ja"].lang-option').click();
-  await expect(page.locator('html')).toHaveAttribute('data-navigating');
-  const samples = await page.evaluate(() => new Promise<number[]>(resolve => {
-    const values: number[] = [];
-    const sample = () => {
-      if (!document.documentElement.hasAttribute('data-navigating')) { resolve(values); return; }
-      values.push(document.querySelector('#education')!.getBoundingClientRect().height);
-      requestAnimationFrame(sample);
-    };
-    sample();
-  }));
-  expect(samples.length).toBeGreaterThan(1);
-  expect(Math.max(...samples) - Math.min(...samples)).toBeLessThan(1);
-  await expect(page.locator('html')).toHaveAttribute('lang', 'ja');
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __languageAnimations?: Animation[] }).__languageAnimations?.length ?? 0)).toBeGreaterThan(2);
+  const start = await geometry();
+  for (let i = 0; i < old.length; i++) expect(Math.abs(start[i] - old[i]), JSON.stringify({ old, start, index: i })).toBeLessThan(2);
+  const seek = async (fraction: number) => {
+    await page.evaluate(async value => {
+      (window as unknown as { __languageAnimations: Animation[] }).__languageAnimations.forEach(a => { a.currentTime = Number(a.effect!.getTiming().duration) * value; });
+      await new Promise(requestAnimationFrame);
+    }, fraction);
+    return geometry();
+  };
+  const middle = await seek(.5), end = await seek(.999);
+  expect(Math.abs(end[0] - start[0])).toBeGreaterThan(10);
+  for (let i = 0; i < start.length; i++) expect(Math.abs(middle[i] - (start[i] + end[i]) / 2)).toBeLessThan(3);
+  await page.evaluate(() => (window as unknown as { __languageAnimations: Animation[] }).__languageAnimations.forEach(a => a.finish()));
+  await settled(page);
+  const final = await geometry();
+  for (let i = 0; i < final.length; i++) expect(Math.abs(final[i] - end[i])).toBeLessThan(2);
+  await expect(page.locator('[data-layout-held]')).toHaveCount(0);
 });
+}
 
 test('reduced motion switches pages without spatial animation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });

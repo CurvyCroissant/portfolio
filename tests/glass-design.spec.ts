@@ -33,7 +33,7 @@ for (const theme of ['light', 'dark']) {
     for (const selector of ['#theme-toggle', '.project-card', '#copy-email']) {
       await page.locator(selector).first().focus();
       await expect(page.locator(selector).first()).toHaveCSS('outline-style', 'none');
-      await expect(page.locator(selector).first()).toHaveCSS('text-decoration-line', 'underline');
+      await expect(page.locator(selector).first()).toHaveCSS('text-decoration-line', 'none');
     }
   });
 }

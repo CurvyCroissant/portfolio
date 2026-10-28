@@ -1,10 +1,9 @@
 # Project instructions
 
-Read and follow [AGENTS.md](./AGENTS.md), the canonical up-to-date project guidance.
+Read and follow [AGENTS.md](./AGENTS.md), the canonical project guidance.
 
-Use the Liquid Glass design system throughout, with floating glass controls above quieter content materials and smooth interruptible transitions. Remove all selection/focus outlines and rings; show keyboard focus through surface and text feedback. Use the latest requested home/BINUS descriptions and GPA 3.90 in all three languages.
+Use monochrome Liquid Glass materials, page-wide/nested cursor lighting and smooth interruptible motion. Keep skills translucent, contact icon/text groups centered and equally tall, return labels concise (Back / Kembali / 戻る), the moon correctly drawn, and native page scroll within its boundaries. Do not add hero Projects/Contact buttons or selected/viewed/focus underlines, outlines or rings.
 
-Language changes must preserve scroll even when the translated page is shorter, retaining the minimum required document height.
-Interrupted language wipes must keep text, metadata and browser history consistent. Preserve the active theme's translated labels and restore dropdown focus on selection.
+Theme changes have exactly three sequential groups: background, components/containers, then text/icons. Language changes hold the outgoing layout and animate all incoming vertical movement, heights and label widths together. Preserve media, carousel and physics identity; clamp shorter pages smoothly to their natural bottom and release temporary styles without a final jump.
 
-Notable requirements: no Terminal or skeletons; blur image previews and selective lazy loading; spatial page transitions; horizontal-only carousels with page gesture passthrough; hover/keyboard/tap dropdowns; English skill pills; equal-height footer contacts; pastel coordinated themes with outside-in color changes; strong hover/focus/pressed feedback; popup state committed on open; in-place language text wipes with horizontal sizing and held heights. See the canonical file for implementation and verification requirements.
+Maintain the requested home/BINUS descriptions, GPA 3.90, English skill pills and accurate English/Indonesian/Japanese copy. Never restore Terminal or skeletons. Keep blur previews, selective lazy loading, spatial navigation, hover/keyboard/tap dropdowns and accessibility preferences. The canonical file covers validation and responsive requirements.

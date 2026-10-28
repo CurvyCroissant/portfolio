@@ -6,7 +6,7 @@
   try { theme = localStorage.getItem('theme'); } catch {}
   const dark = theme === 'dark' || (theme !== 'light' && matchMedia('(prefers-color-scheme: dark)').matches);
   root.dataset.theme = dark ? 'dark' : 'light';
-  document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#252c3d' : '#eaf0f5');
+  document.querySelector('meta[name="theme-color"]').setAttribute('content', dark ? '#292929' : '#ececec');
 
   const cache = new Map();
   const storage = key => { try { return JSON.parse(sessionStorage.getItem(key)); } catch { return null; } };
