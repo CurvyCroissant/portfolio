@@ -58,7 +58,7 @@ test('carousel vertical wheel gestures scroll the document', async ({ page }) =>
   expect(await carousel.evaluate(el => el.scrollTop)).toBe(0);
 });
 
-test('theme colors use three sequential background, surface and text phases', async ({ page }) => {
+test('theme background, surface, text and headings interpolate together on one clock', async ({ page }) => {
   await page.goto('');
   const read = () => page.evaluate(() => ({
     background: getComputedStyle(document.body).backgroundColor,
@@ -80,14 +80,14 @@ test('theme colors use three sequential background, surface and text phases', as
     }, fraction);
     return read();
   };
-  const background = await seek(1 / 6);
-  expect(background.background).not.toBe(old.background);
-  expect(background.surface).toBe(old.surface); expect(background.text).toBe(old.text);
-  const surface = await seek(1 / 2);
-  expect(surface.surface).not.toBe(old.surface); expect(surface.text).toBe(old.text);
-  const text = await seek(5 / 6);
-  expect(text.text).not.toBe(old.text);
-  expect(text.background).toBe(surface.background);
+  const early = await seek(.15);
+  const middle = await seek(.5);
+  const late = await seek(.85);
+  for (const key of ['background', 'surface', 'text'] as const) {
+    expect(early[key]).not.toBe(old[key]);
+    expect(middle[key]).not.toBe(early[key]);
+    expect(late[key]).not.toBe(middle[key]);
+  }
   await page.evaluate(() => (window as unknown as { __themeAnimation: Animation }).__themeAnimation.finish());
   await expect(page.locator('html')).not.toHaveAttribute('data-theme-changing');
   expect(await page.locator('[style*="--theme-delay"]').count()).toBe(0);
@@ -217,7 +217,7 @@ test(`language heights and positions share one incoming clock at ${width}px with
 });
 }
 
-test('reduced motion switches pages without spatial animation', async ({ page }) => {
+test('OS motion preferences do not change page navigation', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.goto('');
   await page.locator('.project-card').first().click();

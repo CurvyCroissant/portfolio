@@ -29,7 +29,7 @@ export function dateRange(entry: { start: string; end?: string }, locale: Locale
 }
 
 export function clientCopy(locale: Locale) {
-  const keys = ['nav-theme-light', 'nav-theme-dark', 'theme-to-light', 'theme-to-dark', 'nav-motion', 'motion-enable', 'motion-reduce', 'image-loading', 'image-error', 'copied', 'copy-error'] as const;
+  const keys = ['nav-theme-light', 'nav-theme-dark', 'theme-to-light', 'theme-to-dark', 'image-loading', 'image-error', 'copied', 'copy-error'] as const;
   const ui = Object.fromEntries(keys.map(key => [key, t(locale, key)])) as Record<(typeof keys)[number], string>;
   return ui;
 }

@@ -40,17 +40,23 @@ for (const theme of ['light', 'dark']) {
 
 test('hover scale interpolates and touch-style presses release cleanly', async ({ page }) => {
   await page.goto('');
-  await page.locator('#theme-toggle').hover();
-  const scales = await page.locator('#theme-toggle').evaluate(el => new Promise<number[]>(resolve => {
-    const values: number[] = [];
-    const sample = () => {
-      values.push(parseFloat(getComputedStyle(el).scale) || 1);
-      if (values.length < 10) requestAnimationFrame(sample); else resolve(values);
-    };
-    requestAnimationFrame(sample);
-  }));
-  expect(scales.some(scale => scale > 1 && scale < 1.025)).toBe(true);
   const button = page.locator('#theme-toggle');
+  await button.evaluate(element => element.addEventListener('pointerenter', () => {
+    const animation = element.getAnimations().find(a => a instanceof CSSTransition && a.transitionProperty === 'scale');
+    if (!animation) return;
+    animation.pause();
+    const values = [0, .25, .5, .999].map(fraction => {
+      animation.currentTime = Number(animation.effect!.getTiming().duration) * fraction;
+      return parseFloat(getComputedStyle(element).scale) || 1;
+    });
+    Object.assign(window, { __hoverScales: values });
+    animation.finish();
+  }, { once: true }));
+  await button.hover();
+  const scales = await page.evaluate(() => (window as unknown as { __hoverScales: number[] }).__hoverScales);
+  expect(scales).toHaveLength(4);
+  expect(scales[0]).toBe(1); expect(scales[1]).toBeGreaterThan(1);
+  expect(scales[1]).toBeLessThan(scales[3]); expect(scales[3]).toBeCloseTo(1.035, 3);
   await button.dispatchEvent('pointerdown', { pointerType: 'touch', button: 0 });
   await expect(button).toHaveAttribute('data-glass-pressed');
   await button.dispatchEvent('pointercancel', { pointerType: 'touch' });
@@ -72,13 +78,13 @@ test('menu closing stays animated and inert, and reopening reverses it', async (
   await expect(page.locator('#lang-dropdown')).not.toHaveAttribute('open');
 });
 
-test('increased contrast uses solid materials with no backdrop dependency', async ({ page }) => {
+test('OS contrast and transparency preferences retain the global glass materials', async ({ page }) => {
   const cdp = await page.context().newCDPSession(page);
-  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-contrast', value: 'more' }] });
+  await cdp.send('Emulation.setEmulatedMedia', { features: [{ name: 'prefers-contrast', value: 'more' }, { name: 'prefers-reduced-transparency', value: 'reduce' }] });
   await page.goto('');
-  await expect(page.locator('#theme-toggle')).toHaveCSS('backdrop-filter', 'none');
+  await expect(page.locator('#theme-toggle')).toHaveCSS('backdrop-filter', 'blur(26px) saturate(1.55)');
   const color = await page.locator('#theme-toggle').evaluate(el => getComputedStyle(el).backgroundColor);
-  expect(color).not.toContain('rgba');
+  expect(color).toContain('rgba');
 });
 
 for (const native of [true, false]) {

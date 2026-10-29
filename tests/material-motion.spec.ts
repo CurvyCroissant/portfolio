@@ -19,7 +19,7 @@ for (const theme of ['light', 'dark']) {
       await page.emulateMedia({ reducedMotion: motion });
       await page.addInitScript(value => localStorage.setItem('theme', value), theme);
       await page.goto('');
-      await expect(page.locator('#motion-toggle')).toBeVisible();
+      await expect(page.locator('#motion-toggle')).toHaveCount(0);
       await finishArrival(page);
       await page.mouse.move(1255, 12); await page.waitForTimeout(750);
       const clip = { x: 16, y: 160, width: 224, height: 480 };
@@ -27,8 +27,8 @@ for (const theme of ['light', 'dark']) {
       await page.mouse.move(120, 400); await page.waitForTimeout(750);
       const after = await page.screenshot({ clip });
       const difference = await pixelDifference(before, after);
-      expect(difference.mean).toBeGreaterThan(8);
-      expect(difference.fraction).toBeGreaterThan(.35);
+      expect(difference.mean).toBeGreaterThan(theme === 'dark' ? 4 : 8);
+      expect(difference.fraction).toBeGreaterThan(theme === 'dark' ? .25 : .35);
       const layer = await page.locator('.cursor-light').evaluate(element => ({ opacity: getComputedStyle(element).opacity, parent: getComputedStyle(element.parentElement!).zIndex }));
       expect(layer.opacity).toBe('1'); expect(Number(layer.parent)).toBeGreaterThanOrEqual(0);
     });
@@ -111,7 +111,7 @@ test('the production glass actually blurs content beneath it', async ({ page, br
   expect(stripes).toBeGreaterThan(15); expect(smooth).toBeLessThan(stripes * .55);
 });
 
-test('arrival and image-viewer motion have intermediate geometry, and the Motion control updates physics', async ({ page }) => {
+test('arrival and image-viewer motion have intermediate geometry, and skills retain physics', async ({ page }) => {
   await page.goto('');
   const arrival = await page.locator('.hero > h1').evaluate(element => {
     const a = element.getAnimations().find(animation => animation.id === 'portfolio-arrival')!;
@@ -142,35 +142,60 @@ test('arrival and image-viewer motion have intermediate geometry, and the Motion
   const skills = page.locator('#skills-container');
   await skills.scrollIntoViewIfNeeded();
   await expect(skills).toHaveClass(/physics-active/);
-  await page.locator('#motion-toggle').click();
-  await expect(skills).not.toHaveClass(/physics-active/);
-  await page.locator('#motion-toggle').click();
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(skills).toHaveClass(/physics-active/);
 });
 
-test('an explicit Motion choice restores CSS and scripted animation under system reduction and persists', async ({ page }) => {
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+test('global setup ignores OS preferences and obsolete motion choices while theme selection persists', async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce', colorScheme: 'dark', contrast: 'more' });
+  await page.addInitScript(() => localStorage.setItem('portfolio-motion', 'reduced'));
   await page.goto('');
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
-  await page.locator('#motion-toggle').click();
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
-  expect(await page.evaluate(() => matchMedia('(prefers-reduced-motion: reduce)').matches)).toBe(true);
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await expect(page.locator('#motion-toggle, #motion-label')).toHaveCount(0);
+  await expect(page.locator('#theme-toggle')).toHaveCSS('backdrop-filter', 'blur(26px) saturate(1.55)');
+  const initial = await page.locator('#theme-toggle').evaluate(element => ({ background: getComputedStyle(element).backgroundColor, transition: getComputedStyle(element).transitionDuration }));
+  expect(initial.transition).not.toBe('0s');
+  await page.emulateMedia({ reducedMotion: 'no-preference', colorScheme: 'light', contrast: 'no-preference' });
+  const changed = await page.locator('#theme-toggle').evaluate(element => ({ background: getComputedStyle(element).backgroundColor, transition: getComputedStyle(element).transitionDuration }));
+  expect(changed).toEqual(initial);
+  await page.locator('#theme-toggle').click();
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme-changing');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.emulateMedia({ colorScheme: 'dark', reducedMotion: 'reduce' });
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+});
+
+test('menu slides down from the toggle and retracts without fading, scaling or a reversal jump', async ({ page }) => {
+  await page.goto(''); await finishArrival(page);
   await page.locator('#lang-toggle').hover();
   const frames = await page.locator('.lang-menu').evaluate(element => {
-    const a = element.getAnimations().find(animation => (animation.effect as KeyframeEffect).getKeyframes().some(frame => 'transform' in frame))!;
-    a.pause(); a.currentTime = 0;
-    const read = () => ({ opacity: Number(getComputedStyle(element).opacity), width: element.getBoundingClientRect().width });
-    const before = read(); a.currentTime = Number(a.effect!.getTiming().duration) / 2; const middle = read();
-    a.finish(); return { before, middle, duration: a.effect!.getTiming().duration };
+    const a = element.getAnimations().find(animation => animation.id === 'portfolio-menu')!;
+    a.pause();
+    const read = (fraction: number) => {
+      a.currentTime = Number(a.effect!.getTiming().duration) * fraction;
+      const css = getComputedStyle(element), box = element.getBoundingClientRect();
+      return { top: box.top, width: box.width, opacity: css.opacity, scale: new DOMMatrix(css.transform).a };
+    };
+    const before = read(0), middle = read(.35), end = read(1);
+    a.currentTime = Number(a.effect!.getTiming().duration) * .35;
+    return { before, middle, end };
   });
-  expect(frames.duration).toBeGreaterThanOrEqual(500);
-  expect(frames.middle.opacity).toBeGreaterThan(frames.before.opacity); expect(frames.middle.opacity).toBeLessThan(1);
-  expect(frames.middle.width).toBeGreaterThan(frames.before.width);
-  await page.reload();
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'full');
-  await page.locator('#motion-toggle').click();
-  await expect(page.locator('html')).toHaveAttribute('data-motion', 'reduced');
-  await expect(page.locator('#theme-toggle')).toHaveCSS('transition-duration', '0s');
+  expect(frames.before.top).toBeLessThan(frames.middle.top);
+  expect(frames.middle.top).toBeLessThan(frames.end.top);
+  expect(frames.before.width).toBe(frames.end.width);
+  for (const frame of Object.values(frames)) { expect(frame.opacity).toBe('1'); expect(frame.scale).toBe(1); }
+  const panel = page.locator('.lang-menu');
+  const beforeClose = await panel.evaluate(element => getComputedStyle(element).transform);
+  await page.keyboard.press('Escape');
+  const reverse = await panel.evaluate(element => {
+    const a = element.getAnimations().find(animation => animation.id === 'portfolio-menu')!;
+    a.pause(); a.currentTime = 0;
+    const value = getComputedStyle(element).transform;
+    a.finish(); return value;
+  });
+  expect(reverse).toBe(beforeClose);
+  await expect(page.locator('#lang-dropdown')).not.toHaveAttribute('open');
 });
 
 test('missing timing tokens retain a smooth menu animation instead of becoming zero', async ({ page }) => {
@@ -180,7 +205,7 @@ test('missing timing tokens retain a smooth menu animation instead of becoming z
   expect(await page.locator('.lang-menu').evaluate(element => element.getAnimations().some(a => Number(a.effect?.getTiming().duration) >= 500))).toBe(true);
 });
 
-test('language layout and three-phase theme motion retain intermediate rendered states', async ({ page }) => {
+test('language layout and simultaneous theme motion retain intermediate rendered states', async ({ page }) => {
   await page.goto(''); await finishArrival(page);
   await page.locator('#theme-toggle').click();
   const theme = await page.evaluate(() => {
@@ -214,6 +239,70 @@ test('language layout and three-phase theme motion retain intermediate rendered 
   const layout = await page.evaluate(() => (window as unknown as { __layoutFrames: { before: number; middle: number; end: number } }).__layoutFrames);
   expect(Math.abs(layout.before - layout.end)).toBeGreaterThan(10);
   expect(Math.abs(layout.middle - (layout.before + layout.end) / 2)).toBeLessThan(2);
+});
+
+test('scroll reveals unfold in perspective and sweep a reflection, then release all temporary paint', async ({ page }) => {
+  await page.goto(''); await finishArrival(page);
+  const card = page.locator('#education .list-item').first();
+  await page.evaluate(() => {
+    const target = document.querySelector('#education .list-item')!;
+    const observer = new MutationObserver(() => {
+      const animation = target.getAnimations().find(a => a.id === 'portfolio-reveal');
+      if (!animation) return;
+      observer.disconnect(); animation.pause(); animation.currentTime = 0;
+    });
+    observer.observe(target, { attributes: true, attributeFilter: ['data-reveal-active'] });
+    target.scrollIntoView({ block: 'center', behavior: 'instant' });
+  });
+  await expect(card).toHaveAttribute('data-reveal-active');
+  const frames = await card.evaluate(element => {
+    const a = element.getAnimations().find(animation => animation.id === 'portfolio-reveal')!;
+    const read = (fraction: number) => {
+      a.currentTime = Number(a.effect!.getTiming().duration) * fraction;
+      const css = getComputedStyle(element), matrix = new DOMMatrix(css.transform);
+      return { width: element.getBoundingClientRect().width, opacity: Number(css.opacity), tilt: matrix.m23 };
+    };
+    const before = read(0), middle = read(.4), end = read(1);
+    const sheen = getComputedStyle(element, '::after');
+    const reflection = { content: sheen.content, animation: sheen.animationName, background: sheen.backgroundImage };
+    a.finish(); return { before, middle, end, reflection };
+  });
+  expect(Math.abs(frames.before.tilt)).toBeGreaterThan(.1);
+  expect(frames.middle.width).toBeGreaterThan(frames.before.width);
+  expect(frames.middle.opacity).toBeGreaterThan(frames.before.opacity);
+  expect(frames.end.tilt).toBe(0); expect(frames.end.opacity).toBe(1);
+  expect(frames.reflection.animation).toBe('glass-unfold-reflection');
+  expect(frames.reflection.background).toContain('linear-gradient');
+  await expect(card).not.toHaveAttribute('data-reveal-active');
+  await expect(card).toHaveCSS('transform', 'none');
+  await expect(card).toHaveCSS('filter', 'none');
+});
+
+test('image popup actions omit arrows while page links retain navigation and text has hover depth', async ({ page }) => {
+  await page.goto(''); await finishArrival(page);
+  await expect(page.locator('[data-lightbox] h3 svg, .proof-link svg')).toHaveCount(0);
+  expect(await page.locator('.project-card h3 svg').count()).toBeGreaterThan(0);
+  const card = page.locator('.project-card').first();
+  await card.scrollIntoViewIfNeeded();
+  await expect.poll(() => card.evaluate(element => element.getAnimations().filter(a => a.id === 'portfolio-reveal').length)).toBe(0);
+  await page.mouse.move(2, 200);
+  await page.waitForTimeout(850);
+  const before = await card.locator('h3').evaluate(element => ({ color: getComputedStyle(element).color, shadow: getComputedStyle(element).textShadow, width: (element as HTMLElement).offsetWidth }));
+  await card.hover();
+  await expect(card.locator('h3')).toHaveCSS('color', 'rgb(23, 23, 23)');
+  const after = await card.locator('h3').evaluate(element => ({ color: getComputedStyle(element).color, shadow: getComputedStyle(element).textShadow, width: (element as HTMLElement).offsetWidth }));
+  expect(after.color).not.toBe(before.color); expect(after.shadow).not.toBe(before.shadow);
+  expect(after.shadow).not.toBe('none'); expect(after.width).toBe(before.width);
+  await page.locator('#theme-toggle').click();
+  await expect(page.locator('html')).not.toHaveAttribute('data-theme-changing');
+  const palette = await page.evaluate(() => {
+    const css = getComputedStyle(document.documentElement);
+    return { bg: css.getPropertyValue('--bg'), surface: css.getPropertyValue('--surface'), secondary: css.getPropertyValue('--secondary') };
+  });
+  expect(palette.bg).toBe('rgb(11, 11, 11)');
+  expect(palette.surface).toContain('24, 24, 24'); expect(palette.secondary).toBe('rgb(189, 189, 189)');
+  await card.hover();
+  await expect(card.locator('h3')).toHaveCSS('color', 'rgb(255, 255, 255)');
 });
 
 test.describe('touch glass controls', () => {

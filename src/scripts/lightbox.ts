@@ -1,7 +1,7 @@
 import type { ClientCopy } from '../lib/i18n';
 import { updateScrollLock } from './preferences';
 import type { PageScope } from './lifecycle';
-import { motionDuration, motionEase, reducedMotion } from './motion';
+import { motionDuration, motionEase } from './motion';
 
 export function setupLightbox(copy: ClientCopy, scope: PageScope) {
   const dialog = document.querySelector<HTMLDialogElement>('#lightbox');
@@ -208,5 +208,4 @@ export function setupLightbox(copy: ClientCopy, scope: PageScope) {
     if (dialog.open) dialog.close();
     updateScrollLock();
   });
-  scope.on(reducedMotion, 'change', () => { if (reducedMotion.matches) animation?.finish(); });
 }

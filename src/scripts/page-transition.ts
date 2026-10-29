@@ -1,17 +1,14 @@
-import { motionDuration, motionEase, reducedMotion } from './motion';
+import { motionDuration, motionEase } from './motion';
 
 /** Keep the old viewport visible until the new page can slide into place. */
 export async function transitionPage(update: () => void, signal: AbortSignal, direction: number) {
   if (signal.aborted) return;
-  if (reducedMotion.matches) { update(); return; }
   const root = document.documentElement;
   root.style.setProperty('--page-enter', `${direction * 32}px`);
   root.style.setProperty('--page-exit', `${-direction * 22}px`);
   let cancel = () => {};
   const stop = () => cancel();
   signal.addEventListener('abort', stop, { once: true });
-  const motionChange = () => { if (reducedMotion.matches) stop(); };
-  reducedMotion.addEventListener('change', motionChange);
   try {
     if (typeof document.startViewTransition === 'function') {
       const transition = document.startViewTransition(() => { if (!signal.aborted) update(); });
@@ -41,7 +38,6 @@ export async function transitionPage(update: () => void, signal: AbortSignal, di
   } finally {
     cancel();
     signal.removeEventListener('abort', stop);
-    reducedMotion.removeEventListener('change', motionChange);
     root.style.removeProperty('--page-enter'); root.style.removeProperty('--page-exit');
   }
 }

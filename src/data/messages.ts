@@ -3,9 +3,6 @@ export const locales = ["en", "id", "ja"] as const;
 export type Locale = (typeof locales)[number];
 
 export const messages = {
-  "nav-motion": { "en": "Motion", "id": "Animasi", "ja": "アニメーション" },
-  "motion-enable": { "en": "Enable animations", "id": "Aktifkan animasi", "ja": "アニメーションを有効にする" },
-  "motion-reduce": { "en": "Reduce animations", "id": "Kurangi animasi", "ja": "アニメーションを減らす" },
   "nav-theme-light": {
     "en": "Light",
     "id": "Terang",

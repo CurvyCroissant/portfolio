@@ -1,15 +1,14 @@
 ---
 import Media from './Media.astro';
-import Icon from './Icon.astro';
 import { imageFor } from '../lib/images';
 import { t, type Locale } from '../lib/i18n';
 interface Props { locale: Locale; image: string; caption: string; description?: string; position?: string; rotation?: number }
 const { locale, image, caption, description, position = 'center', rotation = 0 } = Astro.props;
 const source = imageFor(image);
 ---
-<div class="gallery-item" data-reveal>
-  <a class="cert-card" href={source.src} data-lightbox data-media-width={source.width} data-media-height={source.height} data-title={caption} data-rotation={rotation} aria-label={t(locale, 'open-image', { title: caption })}>
+<div class="gallery-item">
+  <a class="cert-card" href={source.src} data-reveal data-lightbox data-media-width={source.width} data-media-height={source.height} data-title={caption} data-rotation={rotation} aria-label={t(locale, 'open-image', { title: caption })}>
     <Media source={source} locale={locale} alt={caption} width={640} height={440} widths={[320, 640]} sizes="(max-width: 399px) calc(100vw - 72px), 320px" position={position} />
-    <div class="cert-info"><h3>{caption}<Icon name="external" size={15} /></h3>{description && <p>{description}</p>}</div>
+    <div class="cert-info"><h3>{caption}</h3>{description && <p>{description}</p>}</div>
   </a>
 </div>

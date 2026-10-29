@@ -38,6 +38,7 @@ export async function translatePage(incoming: Document, signal: AbortSignal, com
     const pose = reveal ? getComputedStyle(element).transform : undefined;
     const opacity = reveal ? getComputedStyle(element).opacity : undefined;
     reveal?.cancel();
+    element.removeAttribute('data-reveal-active');
     return { element, before: measure(element), after: { height: 0, x: 0, y: 0 },
       height: element.style.height, overflow: element.style.overflow, transform: element.style.transform, opacity: element.style.opacity, pose, revealOpacity: opacity };
   });
@@ -52,7 +53,7 @@ export async function translatePage(incoming: Document, signal: AbortSignal, com
   const targets = old.flatMap((node, index) => {
     if (node.textContent === next[index].textContent) return [];
     const span = document.createElement('span');
-    span.className = 'translation-text'; span.dataset.themeGroup = 'text';
+    span.className = 'translation-text';
     // Headings with trailing glyphs must retain native inline line wrapping.
     const mixed = !!node.parentElement?.querySelector(':scope > svg') && getComputedStyle(node.parentElement).display !== 'inline-flex';
     if (mixed) span.style.display = 'inline';

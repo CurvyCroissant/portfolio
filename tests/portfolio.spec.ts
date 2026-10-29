@@ -189,7 +189,7 @@ test('initial homepage images are small and do not request originals or external
   await expect(page.locator('.media-portrait img:not(.media-preview)')).toHaveAttribute('srcset', /\.webp/);
 });
 
-test('skills sleep without animation frames, survive resizing, and honor reduced motion changes', async ({ page }) => {
+test('skills sleep without animation frames, survive resizing, and ignore OS motion changes', async ({ page }) => {
   await page.addInitScript(() => {
     window.__rafFrames = 0;
     const original = window.requestAnimationFrame;
@@ -219,41 +219,22 @@ test('skills sleep without animation frames, survive resizing, and honor reduced
     return [...container.children].filter(pill => { const box = pill.getBoundingClientRect(); return box.left < bounds.left - 1 || box.right > bounds.right + 1 || box.top < bounds.top - 1 || box.bottom > bounds.bottom + 1; }).length;
   })).toBe(0);
   await page.locator('#skills-container').scrollIntoViewIfNeeded();
-  // Exercise the subscription after idle garbage collection, as on a long-open page.
-  const session = await page.context().newCDPSession(page);
-  await session.send('HeapProfiler.collectGarbage');
-  await session.detach();
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  try {
-    await expect(page.locator('#skills-container')).not.toHaveClass(/physics-active/);
-  } catch (error) {
-    await test.info().attach('motion-preference.json', {
-      contentType: 'application/json',
-      body: JSON.stringify(await page.evaluate(() => ({
-        effective: document.documentElement.dataset.motion,
-        override: document.documentElement.dataset.motionOverride,
-        saved: localStorage.getItem('portfolio-motion'),
-        system: matchMedia('(prefers-reduced-motion: reduce)').matches,
-        visibility: document.visibilityState,
-        transition: getComputedStyle(document.querySelector('#theme-toggle')!).transitionDuration,
-      }))),
-    });
-    throw error;
-  }
+  await expect(page.locator('#skills-container')).toHaveClass(/physics-active/);
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.locator('#skills-container').scrollIntoViewIfNeeded();
   await expect(page.locator('#skills-container')).toHaveClass(/physics-active/);
 });
 
-test('reduced motion never downloads the physics enhancement', async ({ page }) => {
+test('global physics still loads near visibility under OS motion reduction', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   const scripts: string[] = [];
   page.on('request', request => { if (request.resourceType() === 'script') scripts.push(request.url()); });
   await page.goto('');
   await page.locator('#skills-container').scrollIntoViewIfNeeded();
   await page.waitForLoadState('networkidle');
-  expect(scripts.some(url => url.includes('skills-physics'))).toBe(false);
-  await expect(page.locator('#skills-container')).not.toHaveClass(/physics-active/);
+  expect(scripts.some(url => url.includes('skills-physics'))).toBe(true);
+  await expect(page.locator('#skills-container')).toHaveClass(/physics-active/);
 });
 
 test('all generated internal links, images, scripts, and language alternatives resolve', () => {

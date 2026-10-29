@@ -13,6 +13,12 @@ for (const [kind, route, selector] of [
     await page.goto(route, { waitUntil: 'domcontentloaded' });
     const frame = page.locator(selector).first();
     await frame.scrollIntoViewIfNeeded();
+    // Measure loading stability after intentional arrival/reveal geometry settles.
+    await expect.poll(() => frame.evaluate(element => !!element.closest('[data-reveal-pending]'))).toBe(false);
+    await frame.evaluate(async element => {
+      const material = element.closest('[data-reveal], .portrait-link');
+      await Promise.all((material?.getAnimations() ?? []).map(animation => animation.finished.catch(() => {})));
+    });
     await expect(frame).toHaveAttribute('data-media-state', 'loading');
     const preview = frame.locator('.media-preview');
     await expect(preview).toBeVisible();
@@ -167,7 +173,7 @@ for (const width of [375, 1280]) {
   });
 }
 
-test('reduced motion disables dialog animation while preserving image viewing', async ({ page }) => {
+test('global dialog animation remains enabled under OS reduction while preserving image viewing', async ({ page }) => {
   await page.emulateMedia({ reducedMotion: 'reduce' });
   let release!: () => void;
   const pending = new Promise<void>(resolve => { release = resolve; });
@@ -177,7 +183,7 @@ test('reduced motion disables dialog animation while preserving image viewing', 
   release();
   await page.locator('.portrait-link').click();
   await expect(page.locator('#lightbox-media')).toHaveAttribute('data-media-state', 'ready');
-  expect(await page.locator('#lightbox-media').evaluate(element => element.getAnimations().length)).toBe(0);
+  expect(await page.locator('#lightbox-media').evaluate(element => element.getAnimations().some(animation => (animation.effect as KeyframeEffect).getKeyframes().some(frame => 'transform' in frame)))).toBe(true);
   await page.keyboard.press('Escape');
   await expect(page.locator('#lightbox')).not.toBeVisible();
 });
